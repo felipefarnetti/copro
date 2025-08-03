@@ -7,7 +7,7 @@ export async function POST(req) {
   try {
     const { email, password } = await req.json();
     const client = await clientPromise;
-    const db = client.db();
+    const db = client.db("copro");
 
     const user = await db.collection("users").findOne({ email });
     if (!user) {
@@ -20,6 +20,7 @@ export async function POST(req) {
     const token = signToken({ id: user._id, email: user.email, role: user.role });
     return NextResponse.json({ token, role: user.role, email: user.email });
   } catch (e) {
+  console.error("Erreur login:", e);  // Ajoute ce log
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

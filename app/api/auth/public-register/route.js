@@ -4,27 +4,27 @@ import bcrypt from "bcryptjs";
 
 export async function POST(req) {
   try {
-    const { email, password, role, prenom, nom, telephone, batiment, appartement } = await req.json();
+    const { email, password } = await req.json();
     if (!email || !password) {
-      return NextResponse.json({ error: "Email et mot de passe obligatoires" }, { status: 400 });
+      return NextResponse.json({ error: "Champs requis" }, { status: 400 });
     }
+
     const client = await clientPromise;
     const db = client.db("copro");
     const exists = await db.collection("users").findOne({ email });
     if (exists) {
-      return NextResponse.json({ error: "Email déjà utilisé" }, { status: 409 });
+      return NextResponse.json({ error: "Email déjà utilisé" }, { status: 400 });
     }
+
     const hashed = await bcrypt.hash(password, 10);
-    const doc = {
+    await db.collection("users").insertOne({
       email,
       password: hashed,
-      role: role || "copro",
-      prenom, nom, telephone, batiment, appartement,
-      createdAt: new Date()
-    };
-    await db.collection("users").insertOne(doc);
+      role: "copro",
+    });
+
     return NextResponse.json({ success: true });
-  } catch {
+  } catch (e) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }

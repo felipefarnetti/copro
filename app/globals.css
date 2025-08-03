@@ -27,34 +27,53 @@ body {
 
 .input-custom {
   width: 100%;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
-  border-radius: 0.75rem;
-  border: 1px solid #bfdbfe;
-  background-color: #eff6ff;
+  border-radius: 0.5rem;
+  border: 1px solid #d1d5db;
   outline: none;
+  background-color: #fff;
+  color: #1f2937;
+  font-size: 0.875rem;
   transition: all 0.2s;
-  margin-bottom: 0.25rem;
+}
+@media (min-width: 640px) {
+  .input-custom {
+    font-size: 1rem;
+  }
 }
 .input-custom:focus {
-  background-color: #fff;
+  outline: none;
+  box-shadow: 0 0 0 2px #bfdbfe;
   border-color: #60a5fa;
 }
 
+
 .btn-custom {
-  background-color: #1d4ed8;
-  color: #fff;
-  font-weight: 600;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  padding-top: 0.5rem;
-  padding-bottom: 0.5rem;
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  transition: all 0.2s;
+  background-color: #2563eb; /* bg-blue-600 */
+  color: #fff; /* text-white */
+  font-weight: 600; /* font-semibold */
+  border-radius: 0.5rem; /* rounded */
+  transition: background-color 0.2s, opacity 0.2s; /* transition */
+  padding-left: 0.75rem; /* px-3 */
+  padding-right: 0.75rem; /* px-3 */
+  padding-top: 0.5rem; /* py-2 */
+  padding-bottom: 0.5rem; /* py-2 */
+  font-size: 0.875rem; /* text-sm */
+  opacity: 1;
+  pointer-events: auto;
+}
+@media (min-width: 640px) {
+  .btn-custom {
+    font-size: 1rem; /* sm:text-base */
+  }
+}
+.btn-custom:disabled {
+  opacity: 0.5; /* disabled:opacity-50 */
+  pointer-events: none; /* disabled:pointer-events-none */
 }
 .btn-custom:hover {
-  background-color: #1e40af;
+  background-color: #1e40af; /* hover:bg-blue-700 */
 }

@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -24,43 +25,22 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen flex flex-col justify-center items-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-300">
-      <div className="sm:w-full w-[90vw] max-w-md flex flex-col items-center">
-        <h1 className="text-3xl font-bold mb-8 text-blue-700 drop-shadow-sm text-center">Espace Copropriété</h1>
-        <form
-          onSubmit={handleSubmit}
-          className="w-full bg-white/90 shadow-xl rounded-2xl p-8 border border-blue-100"
-        >
-          <h2 className="text-xl font-semibold mb-4 text-center text-blue-700">Connexion</h2>
-          <label className="block mb-1 text-blue-700 font-medium">Adresse email</label>
-          <input
-            type="email"
-            placeholder="exemple@email.com"
-            required
-            className="input-custom mb-3"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            autoComplete="username"
-          />
-          <label className="block mb-1 text-blue-700 font-medium">Mot de passe</label>
-          <input
-            type="password"
-            placeholder="Mot de passe"
-            required
-            className="input-custom mb-2"
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            autoComplete="current-password"
-          />
-          {error && <p className="text-red-600 text-sm mb-2 text-center">{error}</p>}
-          <button
-            className="btn-custom w-full mt-3"
-            type="submit"
-          >
-            Se connecter
-          </button>
-        </form>
-      </div>
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-300 px-2">
+      {/* Titre général */}
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-800 mb-8 drop-shadow text-center">
+        Gestion de Copropriété
+      </h1>
+      <form onSubmit={handleSubmit} className="bg-white shadow p-4 sm:p-6 rounded w-full max-w-xs sm:max-w-md">
+        <h2 className="text-xl sm:text-2xl mb-4 text-blue-700 text-center">Connexion</h2>
+        <input type="email" placeholder="Email" required className="input-custom mb-2 text-gray-900 text-sm sm:text-base" value={email} onChange={e => setEmail(e.target.value)} />
+        <input type="password" placeholder="Mot de passe" required className="input-custom mb-2 text-gray-900 text-sm sm:text-base" value={password} onChange={e => setPassword(e.target.value)} />
+        {error && <p className="text-red-500 text-center text-sm">{error}</p>}
+        <button className="btn-custom w-full mb-2 text-sm sm:text-base py-2 sm:py-2">Se connecter</button>
+        <div className="text-center mt-3">
+          <span className="text-xs sm:text-sm text-gray-500">Pas encore de compte ? </span>
+          <Link href="/register" className="text-blue-700 font-semibold underline text-xs sm:text-sm">Créer un compte</Link>
+        </div>
+      </form>
     </main>
   );
 }
