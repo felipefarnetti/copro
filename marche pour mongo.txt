@@ -1,0 +1,8 @@
+Marche à suivre pour toi
+Créer une base MongoDB Atlas (je peux t’expliquer en 2 min si tu veux)
+
+Cloner le projet (je te donne le code Next.js, tu remplaces la string de connexion dans .env.local)
+
+Lancer en local (npm install && npm run dev)
+
+Déployer sur Vercel (tu connectes la même base MongoDB)

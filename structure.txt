@@ -1,0 +1,34 @@
+/app
+  /api
+    /auth
+      login.js
+      register.js
+    /problems
+      route.js         // Pour GET/POST incidents
+      [id]/route.js    // Pour GET/PUT/DELETE un incident
+    /users
+      route.js         // Pour GET/POST (liste et création user, réservé admin)
+      [id]/route.js    // Pour GET/PUT/DELETE un user
+  /dashboard
+    page.js            // Dashboard copropriétaire
+  /admin
+    page.js            // Dashboard admin
+  /logout
+    page.js            // Déconnexion
+  layout.js
+  page.js              // Accueil/login
+
+/components
+  Navbar.js
+  ProblemForm.js
+  InfoList.js
+  UserTable.js
+
+/lib
+  mongodb.js           // Connexion à MongoDB
+  auth.js              // Helpers pour JWT, protection des routes
+
+/.env.local            // Secrets MongoDB + JWT
+/tailwind.config.js
+/postcss.config.js
+/README.md

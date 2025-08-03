@@ -24,3 +24,37 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.input-custom {
+  width: 100%;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 0.75rem;
+  border: 1px solid #bfdbfe;
+  background-color: #eff6ff;
+  outline: none;
+  transition: all 0.2s;
+  margin-bottom: 0.25rem;
+}
+.input-custom:focus {
+  background-color: #fff;
+  border-color: #60a5fa;
+}
+
+.btn-custom {
+  background-color: #1d4ed8;
+  color: #fff;
+  font-weight: 600;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: all 0.2s;
+}
+.btn-custom:hover {
+  background-color: #1e40af;
+}

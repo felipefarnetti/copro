@@ -1,0 +1,18 @@
+Plan du projet
+MongoDB (avec MongoDB Atlas, compte gratuit)
+
+Next.js (pages + API)
+
+TailwindCSS (UI)
+
+Gestion des rôles (admin et copropriétaire)
+
+Connexion sécurisée (email/mot de passe, hashé avec bcrypt)
+
+Création utilisateurs uniquement par admin
+
+Gestion des problèmes/incidents
+
+Dashboard copropriétaire (voir infos + ajouter problèmes)
+
+Dashboard admin (voir, éditer, supprimer, ajouter, gérer utilisateurs)
