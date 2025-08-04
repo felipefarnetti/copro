@@ -29,12 +29,16 @@ export default function Annuaire() {
     if (grouped[u.batiment]) grouped[u.batiment].push(u);
   });
   Object.keys(grouped).forEach(bat => {
-    grouped[bat].sort((a, b) => a.nom.localeCompare(b.nom, "fr"));
+    grouped[bat].sort((a, b) => {
+      const nomCompare = a.nom.localeCompare(b.nom, "fr");
+      if (nomCompare !== 0) return nomCompare;
+      return a.prenom.localeCompare(b.prenom, "fr");
+    });
   });
 
   return (
-    <main className="p-2 sm:p-8 max-w-4xl w-full mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-blue-800 text-center">
+   <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
+      <h1 className="text-xl sm:text-3xl font-bold text-white drop-shadow mb-3">
         Annuaire des copropriétaires
       </h1>
 
@@ -53,7 +57,7 @@ export default function Annuaire() {
         ))}
       </div>
 
-      <ul className="space-y-8 mb-8">
+      <ul className="w-full max-w-6xl space-y-4 mb-8">
         {BATIMENTS.filter(b => grouped[b].length > 0).length === 0 && (
           <li className="text-gray-500 italic text-center">Aucun copropriétaire enregistré.</li>
         )}
@@ -63,18 +67,16 @@ export default function Annuaire() {
               <div className="mb-2">
                 <span className="text-md sm:text-xl font-bold text-blue-700">{bat}</span>
               </div>
-              <ul className="space-y-3">
+              <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 justify-center">
                 {grouped[bat].map((u, i) => (
                   <li
                     key={u._id || i}
-                    className="bg-white/90 w-full mx-auto max-w-3xl p-3 sm:p-5 rounded-xl border border-blue-100 text-gray-900 shadow"
+                    className="bg-white/90 w-full mx-auto p-3 sm:p-5 rounded-xl border border-blue-100 text-gray-900 shadow"
                   >
                     <div className="flex flex-wrap gap-8 mb-1">
                       <div>
-                        <span className="font-medium text-blue-700">Prénom :</span> <span className="font-semibold">{u.prenom}</span>
-                      </div>
-                      <div>
                         <span className="font-medium text-blue-700">Nom :</span> <span className="font-semibold">{u.nom}</span>
+                        <span className="ml-8 font-medium text-blue-700">Prénom :</span> <span className="font-semibold">{u.prenom}</span>
                       </div>
                     </div>
                     <div className="mb-1">

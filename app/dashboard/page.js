@@ -4,6 +4,70 @@ import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
 import dayjs from "dayjs";
 
+// -------- Composant affichage activités --------
+function diffHeures(hDebut, hFin) {
+  if (!hDebut || !hFin) return 0;
+  const [h1, m1] = hDebut.split(":").map(Number);
+  const [h2, m2] = hFin.split(":").map(Number);
+  return ((h2 + m2/60) - (h1 + m1/60)) > 0 ? ((h2 + m2/60) - (h1 + m1/60)) : 0;
+}
+
+function ActivitesPublic() {
+  const [activites, setActivites] = useState([]);
+
+  useEffect(() => {
+    fetch("/api/activites")
+      .then(res => res.json())
+      .then(data => setActivites(data));
+  }, []);
+
+ // Date actuelle
+  const now = new Date();
+  const mois = now.getMonth();
+  const annee = now.getFullYear();
+
+  // Total heures du mois en cours
+  const totalHeuresMois = activites
+    .filter(a => {
+      const d = new Date(a.date);
+      return d.getMonth() === mois && d.getFullYear() === annee;
+    })
+    .reduce((sum, a) => sum + diffHeures(a.heureDebut, a.heureFin), 0);
+
+  // Total heures de l'année en cours
+  const totalHeuresAnnee = activites
+    .filter(a => {
+      const d = new Date(a.date);
+      return d.getFullYear() === annee;
+    })
+    .reduce((sum, a) => sum + diffHeures(a.heureDebut, a.heureFin), 0);
+ return (
+    <div className="bg-white/90 border border-blue-100 p-5 mt-8 rounded-xl">
+      <h2 className="text-lg font-semibold mb-3 text-blue-700">Activités réalisées dans la copropriété</h2>
+      <div className="mb-3 font-bold">
+        Total des heures ce mois&nbsp;: <span className="text-blue-800">{totalHeuresMois.toLocaleString(undefined, { maximumFractionDigits: 2 })} h</span>
+        {" / "}
+        Année&nbsp;: <span className="text-blue-800">{totalHeuresAnnee.toLocaleString(undefined, { maximumFractionDigits: 2 })} h</span>
+      </div>
+      <ul className="space-y-2">
+        {activites.length === 0 && <li className="text-gray-400 italic">Aucune activité pour l’instant.</li>}
+        {activites.map((a, i) => (
+          <li key={a._id || i} className="border-l-4 border-blue-500 pl-3 py-1">
+            <div className="font-medium">{a.description}</div>
+            <div className="text-xs text-gray-600">
+              {a.date ? new Date(a.date).toLocaleDateString() : ""}
+              {a.heureDebut && a.heureFin
+                ? ` | ${a.heureDebut} → ${a.heureFin} (${diffHeures(a.heureDebut, a.heureFin).toLocaleString(undefined, { maximumFractionDigits: 2 })} h)`
+                : ""}
+            </div>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+// -------- Fin composant affichage activités --------
+
 export default function Dashboard() {
   const [user, setUser] = useState(null);
   const [problems, setProblems] = useState([]);
@@ -13,21 +77,7 @@ export default function Dashboard() {
   const [infos, setInfos] = useState([]);
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/");
-      return;
-    }
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    setUser(payload);
-
-    fetchProblems(token);
-    fetch("/api/infos")
-      .then(res => res.json())
-      .then(setInfos);
-  }, []);
-
+  // ---- Ici la fonction fetchProblems est bien déclarée avant le useEffect ----
   const fetchProblems = (token) => {
     fetch("/api/problems", {
       headers: { Authorization: `Bearer ${token}` }
@@ -35,6 +85,36 @@ export default function Dashboard() {
       .then(res => res.json())
       .then(setProblems);
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+      return;
+    }
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    setUser(payload); // Pour garder l'email le temps du fetch
+
+    // Fetch pour récupérer prenom/nom
+    fetch("/api/users/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.prenom && data.nom) {
+          setUser(u => ({
+            ...u,
+            prenom: data.prenom,
+            nom: data.nom
+          }));
+        }
+      });
+
+    fetchProblems(token);
+    fetch("/api/infos")
+      .then(res => res.json())
+      .then(setInfos);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -86,15 +166,22 @@ export default function Dashboard() {
 
   return (
     <main className="p-8 max-w-2xl mx-auto">
-<div className="flex justify-between mb-4 items-center">
-    <h1 className="text-lg sm:text-2xl font-bold">Bienvenue, {user?.email}</h1>
-    <button
-      onClick={handleLogout}
-      className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-sm sm:text-base"
-    >
-      Déconnexion
-    </button>
-  </div>
+      <div className="flex justify-between mb-4 items-center">
+        <h1 className="text-lg sm:text-2xl font-bold">
+          Bienvenue,{" "}
+          {user?.prenom && user?.nom
+            ? `${user.prenom} ${user.nom}`
+            : user?.email}
+          <span className="block text-sm font-normal text-blue-900">{user?.email}</span>
+        </h1>
+        <button
+          onClick={handleLogout}
+          className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-sm sm:text-base"
+        >
+          Déconnexion
+        </button>
+      </div>
+
       <form onSubmit={handleSubmit} className="mb-8">
         <label className="block mb-2 font-medium">Décrire un nouveau problème :</label>
         <textarea
@@ -103,7 +190,7 @@ export default function Dashboard() {
           className="w-full border p-2 rounded mb-2 bg-white text-gray-900"
           required
         />
-    <button className="bg-blue-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">Envoyer</button>
+        <button className="bg-blue-600 text-white px-3 py-1 sm:px-4 sm:py-2 rounded text-sm sm:text-base">Envoyer</button>
         {success && <p className="text-green-600 mt-2">{success}</p>}
         {error && <p className="text-red-600 mt-2">{error}</p>}
       </form>
@@ -130,15 +217,26 @@ export default function Dashboard() {
               <span className="font-medium text-blue-700">Description :</span>{" "}
               <span className="text-gray-800">{p.description}</span>
             </div>
-            <span className="text-xs text-gray-500 block mt-1">
-              Statut : {p.statut === "nouveau"
-                ? "Nouveau"
-                : p.statut === "pris en compte"
-                ? "Pris en compte"
+           <span
+            className={
+              "capitalize font-bold px-2 py-0.5 rounded text-xs mt-1 inline-block " +
+              (p.statut === "supprimé"
+                ? "text-red-700 bg-red-50 border border-red-200"
                 : p.statut === "solutionné"
-                ? "Solutionné"
-                : p.statut}
-            </span>
+                ? "text-green-700 bg-green-50 border border-green-200"
+                : p.statut === "pris en compte"
+                ? "text-yellow-700 bg-yellow-50 border border-yellow-200"
+                : "text-blue-700 bg-blue-50 border border-blue-200")
+            }
+          >
+            {p.statut === "nouveau"
+              ? "Nouveau"
+              : p.statut === "pris en compte"
+              ? "Pris en compte"
+              : p.statut === "solutionné"
+              ? "Solutionné"
+              : p.statut}
+          </span>
             <span className="text-xs text-gray-400 block">Par copropriétaire : Utilisateur</span>
           </li>
         ))}
@@ -154,6 +252,10 @@ export default function Dashboard() {
           </li>
         ))}
       </ul>
+
+      {/* -------- Affichage activités -------- */}
+      <ActivitesPublic />
+      {/* -------- Fin activités -------- */}
     </main>
   );
 }
