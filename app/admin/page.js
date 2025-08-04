@@ -145,99 +145,99 @@ export default function AdminDashboard() {
       </div>
 
       {/* Modale création utilisateur */}
-      {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
-          <form
-            onSubmit={handleCreateUser}
-            className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md space-y-3"
-          >
-            <h3 className="text-xl font-bold text-blue-800 mb-2">Créer un utilisateur</h3>
-            <div className="flex gap-2">
-              <input
-                type="text"
-                required
-                placeholder="Prénom"
-                className="w-1/2 border rounded px-2 py-1"
-                value={newUser.prenom}
-                onChange={e => setNewUser(u => ({ ...u, prenom: e.target.value }))}
-              />
-              <input
-                type="text"
-                required
-                placeholder="Nom"
-                className="w-1/2 border rounded px-2 py-1"
-                value={newUser.nom}
-                onChange={e => setNewUser(u => ({ ...u, nom: e.target.value }))}
-              />
-            </div>
-            <input
-              type="email"
-              required
-              placeholder="Email"
-              className="w-full border rounded px-2 py-1"
-              value={newUser.email}
-              onChange={e => setNewUser(u => ({ ...u, email: e.target.value }))}
-            />
-            <input
-              type="tel"
-              placeholder="Téléphone"
-              className="w-full border rounded px-2 py-1"
-              value={newUser.telephone}
-              onChange={e => setNewUser(u => ({ ...u, telephone: e.target.value }))}
-            />
-            <div className="flex gap-2">
-              <select
-                required
-                className="w-1/2 border rounded px-2 py-1"
-                value={newUser.batiment}
-                onChange={e => setNewUser(u => ({ ...u, batiment: e.target.value }))}
-              >
-                <option value="">Bâtiment...</option>
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="H">H</option>
-              </select>
-              <input
-                type="text"
-                placeholder="Appartement"
-                className="w-1/2 border rounded px-2 py-1"
-                value={newUser.appartement}
-                onChange={e => setNewUser(u => ({ ...u, appartement: e.target.value }))}
-              />
-            </div>
-            <select
-              className="w-full border rounded px-2 py-1"
-              value={newUser.role}
-              onChange={e => setNewUser(u => ({ ...u, role: e.target.value }))}
-            >
-              <option value="copro">Copropriétaire</option>
-              <option value="admin">Administrateur</option>
-            </select>
-            <input
-              type="password"
-              required
-              placeholder="Mot de passe"
-              className="w-full border rounded px-2 py-1"
-              value={newUser.password}
-              onChange={e => setNewUser(u => ({ ...u, password: e.target.value }))}
-            />
-            <div className="flex justify-end gap-2 pt-2">
-              <button
-                type="button"
-                className="px-3 py-1 rounded bg-gray-100 hover:bg-gray-200"
-                onClick={() => setShowModal(false)}
-              >Annuler</button>
-              <button
-                type="submit"
-                className="px-4 py-1 rounded bg-blue-700 text-white font-semibold hover:bg-blue-800"
-              >Créer</button>
-            </div>
-          </form>
-        </div>
-      )}
+     {showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+    <form
+      onSubmit={handleCreateUser}
+      className="bg-white rounded-xl shadow-lg p-6 w-full max-w-md space-y-3"
+    >
+      <h3 className="text-xl font-bold text-blue-800 mb-2">Créer un utilisateur</h3>
+      <div className="flex gap-2">
+        <input
+          type="text"
+          required
+          placeholder="Prénom"
+          className="w-1/2 border rounded px-2 py-1 placeholder-gray-500"
+          value={newUser.prenom}
+          onChange={e => setNewUser(u => ({ ...u, prenom: e.target.value }))}
+        />
+        <input
+          type="text"
+          required
+          placeholder="Nom"
+          className="w-1/2 border rounded px-2 py-1 placeholder-gray-500"
+          value={newUser.nom}
+          onChange={e => setNewUser(u => ({ ...u, nom: e.target.value }))}
+        />
+      </div>
+      <input
+        type="email"
+        required
+        placeholder="Email"
+        className="w-full border rounded px-2 py-1 placeholder-gray-500"
+        value={newUser.email}
+        onChange={e => setNewUser(u => ({ ...u, email: e.target.value }))}
+      />
+      <input
+        type="tel"
+        placeholder="Téléphone"
+        className="w-full border rounded px-2 py-1 placeholder-gray-500"
+        value={newUser.telephone}
+        onChange={e => setNewUser(u => ({ ...u, telephone: e.target.value }))}
+      />
+      <div className="flex gap-2">
+        <select
+          required
+    className="w-1/2 border rounded px-2 py-1 text-gray-900 bg-white"
+          value={newUser.batiment}
+          onChange={e => setNewUser(u => ({ ...u, batiment: e.target.value }))}
+        >
+          <option value="">Bâtiment...</option>
+          <option value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+          <option value="E">E</option>
+          <option value="H">H</option>
+        </select>
+        <input
+          type="text"
+          placeholder="Appartement"
+          className="w-1/2 border rounded px-2 py-1 placeholder-gray-500"
+          value={newUser.appartement}
+          onChange={e => setNewUser(u => ({ ...u, appartement: e.target.value }))}
+        />
+      </div>
+      <select
+    className="w-1/2 border rounded px-2 py-1 text-gray-900 bg-white"
+        value={newUser.role}
+        onChange={e => setNewUser(u => ({ ...u, role: e.target.value }))}
+      >
+        <option value="copro">Copropriétaire</option>
+        <option value="admin">Administrateur</option>
+      </select>
+      <input
+        type="password"
+        required
+        placeholder="Mot de passe"
+        className="w-full border rounded px-2 py-1 placeholder-gray-500"
+        value={newUser.password}
+        onChange={e => setNewUser(u => ({ ...u, password: e.target.value }))}
+      />
+      <div className="flex justify-end gap-2 pt-2">
+        <button
+          type="button"
+          className="px-3 py-1 rounded bg-red-500 hover:bg-red-700"
+          onClick={() => setShowModal(false)}
+        >Annuler</button>
+        <button
+          type="submit"
+          className="px-4 py-1 rounded bg-blue-700 text-white font-semibold hover:bg-blue-800"
+        >Créer</button>
+      </div>
+    </form>
+  </div>
+)}
     </main>
   );
 }

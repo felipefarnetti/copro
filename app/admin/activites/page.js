@@ -115,33 +115,35 @@ export default function ActivitesPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-8 px-2 w-full">
       <div className="w-full max-w-2xl bg-white/90 rounded-xl shadow-lg p-6">
-        <h2 className="text-xl font-bold text-blue-800 mb-3">{editId ? "Modifier" : "Ajouter"} une activité à la copropriété</h2>
+        <h2 className="text-xl font-bold text-blue-800 mb-3">
+          {editId ? "Modifier" : "Ajouter"} une activit&eacute; &agrave; la copropri&eacute;t&eacute;
+        </h2>
         <form onSubmit={handleAddOrEdit} className="flex flex-col gap-3 mb-6">
           <input
-            className="border rounded px-2 py-1"
+  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             value={desc}
             required
-            placeholder="Description de l'activité"
+            placeholder="Description de l&apos;activit&eacute;"
             onChange={e => setDesc(e.target.value)}
           />
           <div className="flex gap-2">
             <input
-              className="border rounded px-2 py-1 flex-1"
+  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               type="date"
               value={date}
               required
               onChange={e => setDate(e.target.value)}
             />
             <input
-              className="border rounded px-2 py-1 w-28"
+  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               type="time"
               required
               value={heureDebut}
               onChange={e => setHeureDebut(e.target.value)}
             />
-            <span className="self-center text-xs text-gray-500">→</span>
+            <span className="self-center text-xs text-gray-500">&rarr;</span>
             <input
-              className="border rounded px-2 py-1 w-28"
+  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               type="time"
               required
               value={heureFin}
@@ -163,22 +165,24 @@ export default function ActivitesPage() {
             }
           </div>
         </form>
-      <div className="mb-4">
-  <span className="font-bold text-blue-700">
-    Total des heures du mois&nbsp;:
-    <span className="ml-1">
-      {totalHeuresMois.toLocaleString(undefined, { maximumFractionDigits: 2 })} h
-    </span>
-    <span className="mx-2 text-gray-400">/</span>
-    Total des heures de l'année&nbsp;:
-    <span className="ml-1">
-      {totalHeuresAnnee.toLocaleString(undefined, { maximumFractionDigits: 2 })} h
-    </span>
-  </span>
-</div>
-        <h3 className="text-lg font-semibold mb-2 text-blue-700">Historique des activités</h3>
+        <div className="mb-4">
+          <span className="font-bold text-blue-700">
+            Total des heures du mois&nbsp;:
+            <span className="ml-1">
+              {totalHeuresMois.toLocaleString(undefined, { maximumFractionDigits: 2 })} h
+            </span>
+            <span className="mx-2 text-gray-400">/</span>
+            Total des heures de l&apos;ann&eacute;e&nbsp;:
+            <span className="ml-1">
+              {totalHeuresAnnee.toLocaleString(undefined, { maximumFractionDigits: 2 })} h
+            </span>
+          </span>
+        </div>
+        <h3 className="text-lg font-semibold mb-2 text-blue-700">
+          Historique des activit&eacute;s
+        </h3>
         <ul className="space-y-3">
-          {activites.length === 0 && <li className="text-gray-400 italic">Aucune activité enregistrée.</li>}
+          {activites.length === 0 && <li className="text-gray-400 italic">Aucune activit&eacute; enregistr&eacute;e.</li>}
           {activites.map((a, i) => (
             <li key={a._id || i} className="bg-blue-50 border border-blue-100 p-3 rounded-xl text-gray-800 flex items-center justify-between gap-3">
               <div>
@@ -186,7 +190,7 @@ export default function ActivitesPage() {
                 <div className="text-xs text-gray-500">
                   {a.date ? new Date(a.date).toLocaleDateString() : ""}
                   {a.heureDebut && a.heureFin
-                    ? ` | ${a.heureDebut} → ${a.heureFin} (${diffHeures(a.heureDebut, a.heureFin).toLocaleString(undefined, { maximumFractionDigits: 2 })} h)`
+                    ? ` | ${a.heureDebut} &rarr; ${a.heureFin} (${diffHeures(a.heureDebut, a.heureFin).toLocaleString(undefined, { maximumFractionDigits: 2 })} h)`
                     : ""}
                 </div>
               </div>
