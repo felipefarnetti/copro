@@ -17,7 +17,7 @@ export default function Annuaire() {
       .then(data => setUsers(data.filter(u => u.role === "copro")));
   }, []);
 
-  // Affiche tous ou filtre
+  // Filtrage par bâtiment
   let usersToShow = users;
   if (batimentFilter !== "Tous") {
     usersToShow = users.filter(u => u.batiment === batimentFilter);
@@ -33,8 +33,10 @@ export default function Annuaire() {
   });
 
   return (
-    <main className="p-4 sm:p-8 max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4 text-blue-800 text-center">Annuaire des copropriétaires</h1>
+    <main className="p-2 sm:p-8 max-w-4xl w-full mx-auto">
+      <h1 className="text-2xl font-bold mb-4 text-blue-800 text-center">
+        Annuaire des copropriétaires
+      </h1>
 
       {/* Filtres bâtiments */}
       <div className="flex flex-wrap justify-center gap-2 mb-6">
@@ -58,24 +60,27 @@ export default function Annuaire() {
         {BATIMENTS.map(bat => (
           grouped[bat].length > 0 && (
             <li key={bat}>
-              <div className="mb-3">
-                <span className="text-lg sm:text-xl font-bold text-blue-700">{bat}</span>
+              <div className="mb-2">
+                <span className="text-md sm:text-xl font-bold text-blue-700">{bat}</span>
               </div>
-              <ul className="space-y-4">
+              <ul className="space-y-3">
                 {grouped[bat].map((u, i) => (
-                  <li key={u._id || i} className="bg-white p-4 rounded-lg border border-blue-100 text-gray-900 shadow">
-                    <div className="flex flex-wrap gap-8 mb-2">
+                  <li
+                    key={u._id || i}
+                    className="bg-white/90 w-full mx-auto max-w-3xl p-3 sm:p-5 rounded-xl border border-blue-100 text-gray-900 shadow"
+                  >
+                    <div className="flex flex-wrap gap-8 mb-1">
                       <div>
-                        <span className="font-medium text-blue-700">Prénom :</span> <span>{u.prenom}</span>
+                        <span className="font-medium text-blue-700">Prénom :</span> <span className="font-semibold">{u.prenom}</span>
                       </div>
                       <div>
-                        <span className="font-medium text-blue-700">Nom :</span> <span>{u.nom}</span>
+                        <span className="font-medium text-blue-700">Nom :</span> <span className="font-semibold">{u.nom}</span>
                       </div>
                     </div>
-                    <div>
+                    <div className="mb-1">
                       <span className="font-medium text-blue-700">Email :</span> <span>{u.email}</span>
                     </div>
-                    <div>
+                    <div className="mb-1">
                       <span className="font-medium text-blue-700">Téléphone :</span> <span>{u.telephone}</span>
                     </div>
                     <div>

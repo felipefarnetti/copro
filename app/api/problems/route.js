@@ -41,8 +41,8 @@ export async function POST(req) {
       email: user.email,
       description,
       createdAt: new Date(),
-      status: "nouveau",
-      statusUpdatedAt: new Date()
+      statut: "nouveau",
+      dateStatut: new Date()
     };
     const result = await db.collection("problems").insertOne(doc);
     doc._id = result.insertedId;

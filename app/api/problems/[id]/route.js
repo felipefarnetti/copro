@@ -20,12 +20,12 @@ export async function PUT(req, { params }) {
 
     let update = {};
     if (description) update.description = description;
-    if (statut) {
-      update.statut = statut;
-      if (statut === "solutionné") update.dateResolution = new Date();
-      if (statut === "pris en compte") update.datePrisEnCompte = new Date();
-      if (statut === "supprimé") update.dateSuppression = new Date();
-    }
+if (statut) {
+  update.statut = statut; // toujours "statut" partout, jamais "status"
+  if (statut === "solutionné") update.dateResolution = new Date();
+  if (statut === "pris en compte") update.datePrisEnCompte = new Date();
+  if (statut === "supprimé") update.dateSuppression = new Date();
+}
     const result = await db.collection("problems").updateOne(query, { $set: update });
     if (result.matchedCount === 0) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
 
