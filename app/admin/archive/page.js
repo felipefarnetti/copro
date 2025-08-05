@@ -96,9 +96,12 @@ export default function Archive() {
                     </span>
                   )}
                 </div>
-                <div className="text-xs text-gray-400">
-                  Par copropriétaire : {p.email || "inconnu"}
-                </div>
+               <div className="text-xs text-gray-400">
+  Par copropriétaire :{" "}
+  {p.user
+    ? `${p.user.nom} ${p.user.prenom}`
+    : "inconnu"}
+</div>
               </li>
             ))}
           </ul>

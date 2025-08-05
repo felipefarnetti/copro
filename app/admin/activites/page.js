@@ -7,7 +7,17 @@ function diffHeures(hDebut, hFin) {
   if (!hDebut || !hFin) return 0;
   const [h1, m1] = hDebut.split(":").map(Number);
   const [h2, m2] = hFin.split(":").map(Number);
-  return ((h2 + m2/60) - (h1 + m1/60)) > 0 ? ((h2 + m2/60) - (h1 + m1/60)) : 0;
+  return ((h2 + m2 / 60) - (h1 + m1 / 60)) > 0 ? ((h2 + m2 / 60) - (h1 + m1 / 60)) : 0;
+}
+
+// Affiche une durée décimale en "xh ymin"
+function formatDureeHeuresMinutes(duree) {
+  const heures = Math.floor(duree);
+  const minutes = Math.round((duree - heures) * 60);
+  if (heures === 0 && minutes === 0) return "0min";
+  if (heures === 0) return `${minutes}min`;
+  if (minutes === 0) return `${heures}h`;
+  return `${heures}h ${minutes}min`;
 }
 
 export default function ActivitesPage() {
@@ -120,7 +130,7 @@ export default function ActivitesPage() {
         </h2>
         <form onSubmit={handleAddOrEdit} className="flex flex-col gap-3 mb-6">
           <input
-  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+            className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
             value={desc}
             required
             placeholder="Description de l&apos;activit&eacute;"
@@ -128,14 +138,14 @@ export default function ActivitesPage() {
           />
           <div className="flex gap-2">
             <input
-  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               type="date"
               value={date}
               required
               onChange={e => setDate(e.target.value)}
             />
             <input
-  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               type="time"
               required
               value={heureDebut}
@@ -143,7 +153,7 @@ export default function ActivitesPage() {
             />
             <span className="self-center text-xs text-gray-500">&rarr;</span>
             <input
-  className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
+              className="border border-blue-200 bg-white text-gray-900 rounded px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               type="time"
               required
               value={heureFin}
@@ -169,12 +179,12 @@ export default function ActivitesPage() {
           <span className="font-bold text-blue-700">
             Total des heures du mois&nbsp;:
             <span className="ml-1">
-              {totalHeuresMois.toLocaleString(undefined, { maximumFractionDigits: 2 })} h
+              {formatDureeHeuresMinutes(totalHeuresMois)}
             </span>
             <span className="mx-2 text-gray-400">/</span>
             Total des heures de l&apos;ann&eacute;e&nbsp;:
             <span className="ml-1">
-              {totalHeuresAnnee.toLocaleString(undefined, { maximumFractionDigits: 2 })} h
+              {formatDureeHeuresMinutes(totalHeuresAnnee)}
             </span>
           </span>
         </div>
@@ -190,7 +200,7 @@ export default function ActivitesPage() {
                 <div className="text-xs text-gray-500">
                   {a.date ? new Date(a.date).toLocaleDateString() : ""}
                   {a.heureDebut && a.heureFin
-                    ? ` | ${a.heureDebut} &rarr; ${a.heureFin} (${diffHeures(a.heureDebut, a.heureFin).toLocaleString(undefined, { maximumFractionDigits: 2 })} h)`
+                    ? ` | ${a.heureDebut} → ${a.heureFin} (${formatDureeHeuresMinutes(diffHeures(a.heureDebut, a.heureFin))})`
                     : ""}
                 </div>
               </div>

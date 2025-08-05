@@ -51,6 +51,11 @@ export default function ProblemCard({ problem, refreshProblems, isAdmin, onSetSt
         <span className="font-medium text-blue-700">Signalé le :</span>{" "}
         <span className="text-gray-700">{new Date(problem.createdAt).toLocaleString()}</span>
       </div>
+      {problem.user && (
+        <div className="text-xs text-gray-500 mb-1">
+          Signalé par <span className="font-semibold">{problem.user.prenom} {problem.user.nom}</span>
+        </div>
+      )}
       <div>
         <span className="font-medium text-blue-700">Description :</span>{" "}
         {editMode ? (

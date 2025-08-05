@@ -3,7 +3,8 @@ import clientPromise from "@/lib/mongodb";
 import { ObjectId } from "mongodb";
 
 // DELETE une activité
-export async function DELETE(req, { params }) {
+export async function DELETE(req, contextPromise) {
+  const { params } = await contextPromise;   // <-- important !
   const id = params.id;
   if (!id) return NextResponse.json({ error: "ID manquant" }, { status: 400 });
 
@@ -14,7 +15,8 @@ export async function DELETE(req, { params }) {
 }
 
 // PUT : Modifier une activité
-export async function PUT(req, { params }) {
+export async function PUT(req, contextPromise) {
+  const { params } = await contextPromise;   // <-- important !
   const id = params.id;
   if (!id) return NextResponse.json({ error: "ID manquant" }, { status: 400 });
 
