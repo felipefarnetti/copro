@@ -42,7 +42,7 @@ function ActivitesPublic() {
     })
     .reduce((sum, a) => sum + diffHeures(a.heureDebut, a.heureFin), 0);
  return (
-    <div className="bg-white/90 border border-blue-100 p-5 mt-8 rounded-xl">
+    <div className="bg-white/90 border border-blue-100 p-5 mt-2 rounded-xl">
       <h2 className="text-lg font-semibold mb-3 text-blue-700">Activités réalisées dans la copropriété</h2>
       <div className="mb-3 font-bold">
         Total des heures ce mois&nbsp;: <span className="text-blue-800">{totalHeuresMois.toLocaleString(undefined, { maximumFractionDigits: 2 })} h</span>
@@ -86,35 +86,39 @@ export default function Dashboard() {
       .then(setProblems);
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      router.push("/");
-      return;
-    }
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    setUser(payload); // Pour garder l'email le temps du fetch
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) {
+    router.push("/");
+    return;
+  }
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  if (payload.role === "admin") {
+    router.push("/admin");
+    return;
+  }
+  setUser(payload); // Pour garder l'email le temps du fetch
 
-    // Fetch pour récupérer prenom/nom
-    fetch("/api/users/me", {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data && data.prenom && data.nom) {
-          setUser(u => ({
-            ...u,
-            prenom: data.prenom,
-            nom: data.nom
-          }));
-        }
-      });
+  // Fetch pour récupérer prenom/nom
+  fetch("/api/users/me", {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.prenom && data.nom) {
+        setUser(u => ({
+          ...u,
+          prenom: data.prenom,
+          nom: data.nom
+        }));
+      }
+    });
 
-    fetchProblems(token);
-    fetch("/api/infos")
-      .then(res => res.json())
-      .then(setInfos);
-  }, []);
+  fetchProblems(token);
+  fetch("/api/infos")
+    .then(res => res.json())
+    .then(setInfos);
+}, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -165,14 +169,14 @@ export default function Dashboard() {
   );
 
   return (
-    <main className="p-8 max-w-2xl mx-auto">
+<main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
       <div className="flex justify-between mb-4 items-center">
-        <h1 className="text-lg sm:text-2xl font-bold">
+        <h1 className="text-lg text-white sm:text-2xl font-bold">
           Bienvenue,{" "}
           {user?.prenom && user?.nom
             ? `${user.prenom} ${user.nom}`
             : user?.email}
-          <span className="block text-sm font-normal text-blue-900">{user?.email}</span>
+          <span className="block text-sm font-normal text-white">{user?.email}</span>
         </h1>
         <button
           onClick={handleLogout}
@@ -183,7 +187,7 @@ export default function Dashboard() {
       </div>
 
       <form onSubmit={handleSubmit} className="mb-8">
-        <label className="block mb-2 font-medium">Décrire un nouveau problème :</label>
+        <label className="block text-white mb-2 font-medium">Décrire un nouveau problème :</label>
         <textarea
           value={desc}
           onChange={e => setDesc(e.target.value)}
@@ -194,7 +198,7 @@ export default function Dashboard() {
         {success && <p className="text-green-600 mt-2">{success}</p>}
         {error && <p className="text-red-600 mt-2">{error}</p>}
       </form>
-      <h2 className="text-xl mb-2 font-semibold">Mes problèmes signalés</h2>
+      <h2 className="text-xl text-white mb-2 font-semibold">Mes problèmes signalés</h2>
       <ul className="space-y-2">
         {myProblems.length === 0 && (
           <li className="text-gray-500">Aucun problème signalé.</li>
@@ -204,10 +208,10 @@ export default function Dashboard() {
         ))}
       </ul>
       <hr className="my-6 border-gray-500" />
-      <h2 className="text-xl mb-2 font-semibold">Problèmes signalés par les autres</h2>
+      <h2 className="text-xl text-white mb-2 font-semibold">Problèmes signalés par les autres</h2>
       <ul className="space-y-2">
         {otherProblems.length === 0 && (
-          <li className="text-gray-500 italic">Aucun problème signalé par les autres copropriétaires.</li>
+          <li className="text-gray-500 italic">Aucun problème signalé par les autres habitants.</li>
         )}
         {otherProblems.map((p, i) => (
           <li key={p._id || i} className="bg-gray-50 p-4 rounded-lg border border-blue-100 text-gray-900 shadow">
@@ -237,22 +241,12 @@ export default function Dashboard() {
               ? "Solutionné"
               : p.statut}
           </span>
-            <span className="text-xs text-gray-400 block">Par copropriétaire : Utilisateur</span>
+            <span className="text-xs text-gray-400 block">Par Habitant: Utilisateur</span>
           </li>
         ))}
       </ul>
-      <h2 className="text-xl mt-6 mb-2 font-semibold">Infos générales</h2>
-      <ul className="mb-8">
-        {infos.length === 0 && <li>Aucune information.</li>}
-        {infos.map(info => (
-          <li key={info._id} className="border p-3 mb-2 rounded bg-gray-50">
-            <b>{info.titre}</b>
-            <p>{info.contenu}</p>
-            <span className="text-xs text-gray-500">{new Date(info.createdAt).toLocaleString()}</span>
-          </li>
-        ))}
-      </ul>
-
+      <h2 className="text-xl text-white mt-8 mb-2 font-semibold">Infos générales</h2>
+      
       {/* -------- Affichage activités -------- */}
       <ActivitesPublic />
       {/* -------- Fin activités -------- */}

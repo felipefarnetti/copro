@@ -39,7 +39,7 @@ export default function Annuaire() {
   return (
    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
       <h1 className="text-xl sm:text-3xl font-bold text-white drop-shadow mb-3">
-        Annuaire des copropriétaires
+        Annuaire des Habitants
       </h1>
 
       {/* Filtres bâtiments */}
@@ -59,7 +59,7 @@ export default function Annuaire() {
 
       <ul className="w-full max-w-6xl space-y-4 mb-8">
         {BATIMENTS.filter(b => grouped[b].length > 0).length === 0 && (
-          <li className="text-gray-500 italic text-center">Aucun copropriétaire enregistré.</li>
+          <li className="text-gray-500 italic text-center">Aucun habitant enregistré.</li>
         )}
         {BATIMENTS.map(bat => (
           grouped[bat].length > 0 && (

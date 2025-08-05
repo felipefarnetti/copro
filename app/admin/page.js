@@ -91,33 +91,40 @@ export default function AdminDashboard() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
-      <div className="w-full max-w-3xl">
-        <div className="flex flex-wrap gap-2 justify-between items-center mb-8">
-          <h1 className="text-lg sm:text-3xl font-bold text-white drop-shadow">Dashboard Admin</h1>
-          <div className="flex flex-wrap gap-2">
-            {/* BOUTON CREER UTILISATEUR */}
-            <button
-              className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow text-xs sm:text-base"
-              onClick={() => setShowModal(true)}
-            >Créer utilisateur</button>
-            {/* NOUVEAU bouton pour todo/syndic */}
-            <button
-              className="bg-yellow-100 text-yellow-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-yellow-200 text-xs sm:text-base"
-              onClick={goToTodoSyndic}
-            >ToDo / Syndic</button>
-            {/* NOUVEAU bouton pour activités */}
-            <button
-              className="bg-green-100 text-green-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-green-200 text-xs sm:text-base"
-              onClick={goToActivites}
-            >Activités copropriété</button>
-            <Link href="/admin/annuaire" className="bg-blue-100 text-blue-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-blue-200 text-xs sm:text-base">Annuaire</Link>
-            <Link href="/admin/archive" className="bg-blue-100 text-blue-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-blue-200 text-xs sm:text-base">Historique</Link>
-            <button
-              onClick={handleLogout}
-              className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-xs sm:text-base"
-            >Déconnexion</button>
-          </div>
-        </div>
+   <div className="w-full max-w-3xl">
+  <div className="flex flex-col items-center mb-8 gap-4">
+    {/* Titre centré */}
+    <h1 className="text-lg sm:text-3xl font-bold text-white drop-shadow text-center w-full">
+      Dashboard Admin
+    </h1>
+    {/* Boutons en 2 lignes de 3, centrés */}
+    <div className="flex flex-col gap-2 w-full items-center">
+      <div className="flex flex-wrap gap-2 justify-center w-full">
+        {/* 1er groupe : 3 premiers boutons */}
+        <button
+          className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow text-xs sm:text-base"
+          onClick={() => setShowModal(true)}
+        >Créer utilisateur</button>
+        <button
+          className="bg-yellow-100 text-yellow-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-yellow-200 text-xs sm:text-base"
+          onClick={goToTodoSyndic}
+        >ToDo / Syndic</button>
+        <button
+          className="bg-green-100 text-green-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-green-200 text-xs sm:text-base"
+          onClick={goToActivites}
+        >Activités Habitant</button>
+      </div>
+      <div className="flex flex-wrap gap-2 justify-center w-full">
+        {/* 2ème groupe : 3 autres boutons */}
+        <Link href="/admin/annuaire" className="bg-blue-100 text-blue-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-blue-200 text-xs sm:text-base">Annuaire</Link>
+        <Link href="/admin/archive" className="bg-blue-100 text-blue-900 font-semibold px-3 py-1 rounded-xl shadow hover:bg-blue-200 text-xs sm:text-base">Historique</Link>
+        <button
+          onClick={handleLogout}
+          className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-xs sm:text-base"
+        >Déconnexion</button>
+      </div>
+    </div>
+  </div>
         {successMsg && (
           <div className="w-full max-w-3xl mb-4 mx-auto text-center">
             <div className="inline-block bg-green-50 text-green-800 border border-green-300 rounded px-4 py-2 text-sm shadow">
@@ -213,7 +220,7 @@ export default function AdminDashboard() {
         value={newUser.role}
         onChange={e => setNewUser(u => ({ ...u, role: e.target.value }))}
       >
-        <option value="copro">Copropriétaire</option>
+        <option value="copro">Habitant</option>
         <option value="admin">Administrateur</option>
       </select>
       <input

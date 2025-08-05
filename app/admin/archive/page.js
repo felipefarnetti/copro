@@ -97,7 +97,7 @@ export default function Archive() {
                   )}
                 </div>
                <div className="text-xs text-gray-400">
-  Par copropriétaire :{" "}
+  Par habitant:{" "}
   {p.user
     ? `${p.user.nom} ${p.user.prenom}`
     : "inconnu"}
