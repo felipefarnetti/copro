@@ -13,11 +13,11 @@ export async function POST(req) {
     headings: { en: body.title }
   };
 
-  const resp = await fetch("https://onesignal.com/api/v9/notifications", {
+  const resp = await fetch("https://onesignal.com/api/v1/notifications", {
     method: "POST",
     headers: {
       "accept": "application/json",
-      "Authorization": `Bearer ${ONESIGNAL_API_KEY}`,
+      "Authorization": `Basic ${ONESIGNAL_API_KEY}`,
       "content-type": "application/json"
     },
     body: JSON.stringify(payload),
