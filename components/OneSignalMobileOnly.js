@@ -22,10 +22,7 @@ export default function OneSignalMobileOnly() {
         await OneSignal.init({
           appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
         });
-        // 👉 Affiche le prompt d’abonnement juste après l'init !
-        console.log("OneSignal =", OneSignal);
-
-await OneSignal.Slidedown.promptPush();
+   await OneSignal.Slidedown.promptPush();
       });
     };
 
