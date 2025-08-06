@@ -1,6 +1,6 @@
 import { Geist, Geist_Mono } from "next/font/google";
+import OneSignalMobileOnly from "../components/OneSignalMobileOnly";
 import "./globals.css";
-import Script from "next/script"; // AJOUT
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,25 +20,8 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {/* --- OneSignal SDK et init (version OneSignal v16) --- */}
-        <Script
-          src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
-          strategy="afterInteractive"
-        />
-        <Script id="onesignal-init" strategy="afterInteractive">
-          {`
-            window.OneSignalDeferred = window.OneSignalDeferred || [];
-            OneSignalDeferred.push(async function(OneSignal) {
-              await OneSignal.init({
-                appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
-              });
-            });
-          `}
-        </Script>
-        {/* --- FIN OneSignal --- */}
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        <OneSignalMobileOnly />
         {children}
       </body>
     </html>
