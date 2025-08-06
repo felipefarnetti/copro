@@ -22,8 +22,9 @@ export async function POST(req) {
   });
 
   if (!resp.ok) {
-    const error = await resp.json();
-    return new Response(JSON.stringify({ error }), { status: 500 });
+ const error = await resp.json();
+  console.error("OneSignal API error:", error);
+  return new Response(JSON.stringify({ error }), { status: 500 });
   }
 
   const data = await resp.json();
