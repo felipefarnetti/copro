@@ -1,37 +1,32 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export default function SubscribeNotifButton() {
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    // Charge le SDK s'il n'est pas déjà présent
-    if (!window.OneSignal) {
-      const script = document.createElement("script");
-      script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
-      script.async = true;
-      document.head.appendChild(script);
-      script.onload = () => setReady(true);
-      return () => document.head.removeChild(script);
-    } else {
-      setReady(true);
-    }
-  }, []);
+  const [clicked, setClicked] = useState(false);
 
   const handleClick = async () => {
-    if (window.OneSignal && window.OneSignal.Slidedown) {
-      await window.OneSignal.init({
-        appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
-      });
+    setClicked(true);
+    // Ne refait PAS OneSignal.init ici !
+    if (
+      window.OneSignal &&
+      window.OneSignal.Slidedown &&
+      window.OneSignal.Slidedown.promptPush
+    ) {
       await window.OneSignal.Slidedown.promptPush();
+    } else {
+      alert(
+        "OneSignal n'est pas encore prêt ou non supporté par ce navigateur."
+      );
     }
+    setClicked(false);
   };
 
   return (
     <button
-      className="bg-blue-600 text-white px-4 py-2 rounded-lg mt-4"
+      className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-4 py-2 rounded-lg mt-8 shadow transition"
       onClick={handleClick}
-      disabled={!ready}
+      disabled={clicked}
+      type="button"
     >
       S’abonner aux notifications
     </button>
