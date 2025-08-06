@@ -1,13 +1,11 @@
 "use client";
 import { useEffect } from "react";
 
+// Plus besoin de isMobileBrowser !
 
-
-export default function OneSignalMobileOnly() {
+export default function OneSignalPrompt() {
   useEffect(() => {
-    if (!isMobileBrowser()) return;
-
-    // Injecter SDK v16 dynamiquement
+    // On ne teste plus la plateforme, on injecte partout (mobile + desktop)
     const script = document.createElement("script");
     script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
     script.async = true;
@@ -19,10 +17,8 @@ export default function OneSignalMobileOnly() {
         await OneSignal.init({
           appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
         });
-        // 👉 Affiche le prompt d’abonnement juste après l'init !
-        console.log("OneSignal =", OneSignal);
-
-  await OneSignal.Slidedown.promptPush();
+        // 👉 Prompt sur toutes les plateformes compatibles
+        await OneSignal.Slidedown.promptPush();
       });
     };
 
