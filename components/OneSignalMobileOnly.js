@@ -10,7 +10,7 @@ export default function OneSignalMobileOnly() {
   useEffect(() => {
     if (!isMobileBrowser()) return;
 
-    // Injecter SDK v16 dynamiquement (pas avec <Script> Next.js !)
+    // Injecter SDK v16 dynamiquement
     const script = document.createElement("script");
     script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
     script.async = true;
@@ -21,12 +21,12 @@ export default function OneSignalMobileOnly() {
       window.OneSignalDeferred.push(async function(OneSignal) {
         await OneSignal.init({
           appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
-          // ...ajoute d'autres options ici si tu veux
         });
+        // 👉 Affiche le prompt d’abonnement juste après l'init !
+        OneSignal.showSlidedownPrompt();
       });
     };
 
-    // Nettoyage si besoin (optionnel)
     return () => {
       document.head.removeChild(script);
     };
