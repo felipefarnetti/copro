@@ -6,6 +6,9 @@ export async function POST(req) {
   const ONESIGNAL_APP_ID = "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83";
   const ONESIGNAL_API_KEY = process.env.ONESIGNAL_API_KEY;
 
+  console.log("ONESIGNAL_API_KEY (test log):", ONESIGNAL_API_KEY);
+
+
   const resp = await fetch("https://onesignal.com/api/v1/notifications", {
     method: "POST",
     headers: {
