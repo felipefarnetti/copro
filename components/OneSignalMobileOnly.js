@@ -1,10 +1,7 @@
 "use client";
 import { useEffect } from "react";
 
-function isMobileBrowser() {
-  if (typeof navigator === "undefined") return false;
-  return /android|iphone|ipad|ipod|windows phone/i.test(navigator.userAgent);
-}
+
 
 export default function OneSignalMobileOnly() {
   useEffect(() => {
