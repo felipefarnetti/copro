@@ -25,7 +25,7 @@ export default function OneSignalMobileOnly() {
         // 👉 Affiche le prompt d’abonnement juste après l'init !
         console.log("OneSignal =", OneSignal);
 
-        OneSignal.showSlidedownPrompt();
+await OneSignal.Slidedown.promptPush();
       });
     };
 
