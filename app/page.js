@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
+import SubscribeNotifButton from "../components/SubscribeNotifButton";
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -40,6 +41,7 @@ export default function Home() {
           <span className="text-xs sm:text-sm text-gray-500">Pas encore de compte ? </span>
           <Link href="/register" className="text-blue-700 font-semibold underline text-xs sm:text-sm">Créer un compte</Link>
         </div>
+            <SubscribeNotifButton />
       </form>
     </main>
   );
