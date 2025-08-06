@@ -1,33 +1,32 @@
 // /app/api/notify/route.js
 export async function POST(req) {
-  const body = await req.json(); // attend { title, message }
-
-  // Récupère tes clés depuis les variables d'environnement pour plus de sécurité
+  const body = await req.json();
   const ONESIGNAL_APP_ID = "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83";
   const ONESIGNAL_API_KEY = process.env.ONESIGNAL_API_KEY;
 
-  console.log("ONESIGNAL_API_KEY (test log):", ONESIGNAL_API_KEY);
+  // Construction du payload pour l'API v9
+  const payload = {
+    app_id: ONESIGNAL_APP_ID,
+    included_segments: ["All"],
+    name: "Notification",
+    contents: { en: body.message },
+    headings: { en: body.title }
+  };
 
-
-  const resp = await fetch("https://onesignal.com/api/v1/notifications", {
+  const resp = await fetch("https://onesignal.com/api/v9/notifications", {
     method: "POST",
     headers: {
-      "Authorization": `Basic ${ONESIGNAL_API_KEY}`,
-      "Content-Type": "application/json",
+      "accept": "application/json",
+      "Authorization": `Bearer ${ONESIGNAL_API_KEY}`,
+      "content-type": "application/json"
     },
-    body: JSON.stringify({
-      app_id: ONESIGNAL_APP_ID,
-      included_segments: ["All"], // pour tout le monde
-      headings: { en: body.title },
-      contents: { en: body.message },
-      url: body.url || undefined, // Optionnel : lien cliquable sur la notif
-    }),
+    body: JSON.stringify(payload),
   });
 
   if (!resp.ok) {
- const error = await resp.json();
-  console.error("OneSignal API error:", error);
-  return new Response(JSON.stringify({ error }), { status: 500 });
+    const error = await resp.json();
+    console.error("OneSignal v9 API error:", error);
+    return new Response(JSON.stringify({ error }), { status: 500 });
   }
 
   const data = await resp.json();
