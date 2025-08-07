@@ -10,7 +10,11 @@ export async function POST(req) {
     included_segments: ["All"],
     name: "Notification",
     contents: { en: body.message },
-    headings: { en: body.title }
+    headings: { en: body.title },
+    // Ajoute un tag unique pour éviter le remplacement
+    ttl: 300,
+    priority: 10,
+    web_push_topic: `notif-${Date.now()}`
   };
 
   const resp = await fetch("https://onesignal.com/api/v1/notifications", {
