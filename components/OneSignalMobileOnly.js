@@ -1,8 +1,7 @@
 "use client";
 import { useEffect } from "react";
 
-// Pour tests uniquement (forcer mobile)
-const isMobileBrowser = () => true;
+const isMobileBrowser = () => true; // pour forcer le test
 
 export default function OneSignalMobileOnly({ email }) {
   useEffect(() => {
@@ -30,27 +29,15 @@ export default function OneSignalMobileOnly({ email }) {
           });
           console.log("✅ OneSignal initialisé");
 
-          // Si pas encore abonné, proposer le prompt
           const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
           if (!isOptedIn) {
             console.log("🔔 Affichage du prompt d'abonnement");
             await OneSignal.Slidedown.promptPush();
           }
 
-          // Réessaie jusqu'à 10 fois pour setExternalUserId
-          let attempts = 0;
-          while (!OneSignal.User?.setExternalUserId && attempts < 10) {
-            console.log("⏳ Attente User.setExternalUserId... (tentative", attempts + 1, ")");
-            await new Promise(res => setTimeout(res, 1000));
-            attempts++;
-          }
-
-          if (OneSignal.User?.setExternalUserId) {
-            await OneSignal.User.setExternalUserId(email);
-            console.log("📥 externalUserId enregistré :", email);
-          } else {
-            console.warn("❌ Impossible de définir setExternalUserId après 10 tentatives");
-          }
+          // 👉 Ajout d'un tag "email" à l'utilisateur
+          await OneSignal.User.addTag("email", email);
+          console.log("🏷️ Tag email envoyé :", email);
 
         } catch (e) {
           console.error("❌ OneSignal init error:", e);
