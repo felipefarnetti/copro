@@ -3,9 +3,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
 import NotificationPanel from "../../components/NotificationPanel";
+import OneSignalMobileOnly from "../../components/OneSignalMobileOnly";
 import Link from "next/link";
-import OneSignal from 'react-onesignal';
-
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -32,10 +31,6 @@ useEffect(() => {
   if (payload.role !== "admin") { router.push("/dashboard"); return; }
   setUser(payload);
 
-  // 🟢 Associer l'utilisateur connecté à son ID OneSignal (email = External ID)
-  if (payload.email) {
-    OneSignal.setExternalUserId(payload.email);
-  }
   fetchProblems(token);
 }, []);
 
@@ -118,6 +113,7 @@ useEffect(() => {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
+            {user && <OneSignalMobileOnly email={user.email} />}
       <div className="w-full max-w-3xl">
         <div className="flex flex-col items-center mb-8 gap-4">
           {/* Titre centré */}
