@@ -1,12 +1,14 @@
 "use client";
 import { useEffect } from "react";
 
+// ⛔ TEMPORAIRE : désactivé pour tests sur desktop
+function isMobileBrowser() {
+  return true; // <-- forcer le test même sur desktop
+}
+
 export default function OneSignalMobileOnly({ email }) {
   useEffect(() => {
-    if (!email) {
-      console.log("⏳ OneSignalMobileOnly attend un email...", email);
-      return;
-    }
+    if (!email || !isMobileBrowser()) return;
 
     const script = document.createElement("script");
     script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
@@ -15,20 +17,17 @@ export default function OneSignalMobileOnly({ email }) {
 
     script.onload = () => {
       window.OneSignalDeferred = window.OneSignalDeferred || [];
-      console.log("🟢 OneSignal prêt dans Deferred");
-
       window.OneSignalDeferred.push(async function (OneSignal) {
         try {
-          await OneSignal.init({ appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83" });
-          console.log("✅ OneSignal initialisé");
+          await OneSignal.init({
+            appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
+          });
 
-          // Associer l’utilisateur à OneSignal
-          if (email && OneSignal.User && OneSignal.User.setExternalUserId) {
+          if (email) {
             await OneSignal.User.setExternalUserId(email);
-            console.log("🟢 Utilisateur lié à OneSignal :", email);
           }
-        } catch (e) {
-          console.warn("❌ Erreur OneSignal init:", e);
+        } catch (err) {
+          console.warn("⚠️ OneSignal init error:", err);
         }
       });
     };
