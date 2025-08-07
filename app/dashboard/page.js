@@ -160,7 +160,7 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
-{user?.email && <OneSignalMobileOnly email={user.email} />}
+{<OneSignalMobileOnly/>}
 
       <div className="flex justify-between mb-4 items-center w-full max-w-4xl">
         <h1 className="text-lg text-white sm:text-2xl font-bold">
@@ -170,7 +170,7 @@ export default function Dashboard() {
        <div className="flex justify-between items-center w-full">
   <h1 className="text-lg sm:text-2xl font-bold text-white">...</h1>
   <div className="flex items-center gap-3">
-{user?.email && <NotifStatusIcon />}
+{<NotifStatusIcon />}
     <button onClick={handleLogout}
     className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-xs sm:text-base"
 >Déconnexion</button>

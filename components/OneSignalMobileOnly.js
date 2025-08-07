@@ -1,12 +1,16 @@
 "use client";
 import { useEffect } from "react";
 
-const isMobileBrowser = () => true; // pour forcer le test
+// Détection mobile
+const isMobileBrowser = () => {
+  if (typeof navigator === "undefined") return false;
+  return /android|iphone|ipad|ipod|windows phone/i.test(navigator.userAgent);
+};
 
-export default function OneSignalMobileOnly({ email }) {
+export default function OneSignalMobileOnly() {
   useEffect(() => {
-    if (!email || !isMobileBrowser()) {
-      console.log("⏳ OneSignalMobileOnly attend un email...", email);
+    if (!isMobileBrowser()) {
+      console.log("📵 Navigateur non mobile – OneSignal ignoré");
       return;
     }
 
@@ -35,12 +39,8 @@ export default function OneSignalMobileOnly({ email }) {
             await OneSignal.Slidedown.promptPush();
           }
 
-          // 👉 Ajout d'un tag "email" à l'utilisateur
-          await OneSignal.User.addTag("email", email);
-          console.log("🏷️ Tag email envoyé :", email);
-
         } catch (e) {
-          console.error("❌ OneSignal init error:", e);
+          console.error("❌ Erreur OneSignal:", e);
         }
       });
     };
@@ -48,7 +48,7 @@ export default function OneSignalMobileOnly({ email }) {
     return () => {
       document.head.removeChild(script);
     };
-  }, [email]);
+  }, []);
 
   return null;
 }
