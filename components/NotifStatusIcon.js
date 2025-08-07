@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { BellOff, CheckCircle, Loader } from "lucide-react";
+import { Bell, BellOff, Loader } from "lucide-react";
 
 export default function NotifStatusIcon() {
   const [ready, setReady] = useState(false);
@@ -52,7 +52,7 @@ export default function NotifStatusIcon() {
       className="text-white hover:text-yellow-400 transition p-1"
     >
       {enabled === null && <Loader className="animate-spin w-6 h-6" />}
-      {enabled === true && <CheckCircle className="w-6 h-6 text-green-400" />}
+      {enabled === true && <Bell className="w-5 h-5 text-green-500" />}
       {enabled === false && <BellOff className="w-6 h-6 text-yellow-300" />}
     </button>
   );

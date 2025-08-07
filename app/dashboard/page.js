@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
 import OneSignalMobileOnly from "../../components/OneSignalMobileOnly";
+import NotifStatusIcon from "../../components/NotifStatusIcon"; // adapte le chemin
 import dayjs from "dayjs";
 
 function diffHeures(hDebut, hFin) {
