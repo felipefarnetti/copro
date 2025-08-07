@@ -1,7 +1,6 @@
 "use client";
 import { useEffect } from "react";
 
-// Détection mobile
 const isMobileBrowser = () => {
   if (typeof navigator === "undefined") return false;
   return /android|iphone|ipad|ipod|windows phone/i.test(navigator.userAgent);
@@ -9,10 +8,7 @@ const isMobileBrowser = () => {
 
 export default function OneSignalMobileOnly() {
   useEffect(() => {
-    if (!isMobileBrowser()) {
-      console.log("📵 Navigateur non mobile – OneSignal ignoré");
-      return;
-    }
+    if (!isMobileBrowser()) return;
 
     const script = document.createElement("script");
     script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
@@ -22,7 +18,6 @@ export default function OneSignalMobileOnly() {
 
     script.onload = () => {
       console.log("✅ Script OneSignal chargé");
-
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       window.OneSignalDeferred.push(async function (OneSignal) {
         console.log("🟢 OneSignal prêt dans Deferred");
@@ -32,13 +27,6 @@ export default function OneSignalMobileOnly() {
             appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
           });
           console.log("✅ OneSignal initialisé");
-
-          const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
-          if (!isOptedIn) {
-            console.log("🔔 Affichage du prompt d'abonnement");
-            await OneSignal.Slidedown.promptPush();
-          }
-
         } catch (e) {
           console.error("❌ Erreur OneSignal:", e);
         }
