@@ -54,7 +54,16 @@ export default function OneSignalMobileOnly({ email }) {
           await OneSignal.User.PushSubscription.optIn();
           console.log("📥 Utilisateur opt-in");
 
-          await OneSignal.User.setExternalUserId(email);
+          if (OneSignal.setExternalUserId) {
+  await OneSignal.setExternalUserId(email);
+  console.log("📧 externalUserId défini via v15 :", email);
+} else if (OneSignal.User?.setExternalUserId) {
+  await OneSignal.User.setExternalUserId(email);
+  console.log("📧 externalUserId défini via v16 :", email);
+} else {
+  console.warn("⚠️ Aucune méthode pour setExternalUserId disponible.");
+}
+
           console.log("📧 externalUserId enregistré :", email);
         } catch (err) {
           console.warn("❌ Erreur dans l'enregistrement OneSignal :", err);

@@ -4,28 +4,44 @@ import { useState } from "react";
 export default function SubscribeNotifButton() {
   const [clicked, setClicked] = useState(false);
 
-const handleClick = async () => {
-  setClicked(true);
+  const handleClick = async () => {
+    setClicked(true);
+    console.log("🔘 Tentative d'abonnement OneSignal...");
 
-  if (window.OneSignal?.User?.PushSubscription) {
     try {
-      const isEnabled = await window.OneSignal.User.PushSubscription.optedIn;
-      if (isEnabled) {
-        console.log("🔕 Déjà inscrit aux notifications");
-        alert("Vous êtes déjà abonné aux notifications.");
-      } else {
-        await window.OneSignal.Slidedown.promptPush();
-        console.log("🔔 Demande d'abonnement forcée");
+      if (!window.OneSignal) {
+        alert("OneSignal n'est pas encore prêt.");
+        return;
       }
-    } catch (e) {
-      console.warn("❌ Erreur lors du prompt :", e);
-    }
-  } else {
-    alert("OneSignal n'est pas encore prêt ou non supporté par ce navigateur.");
-  }
 
-  setClicked(false);
-};
+      const isV16 = !!window.OneSignal.User?.PushSubscription;
+
+      if (isV16) {
+        const isSubscribed = await window.OneSignal.User.PushSubscription.optedIn;
+        if (isSubscribed) {
+          alert("Vous êtes déjà abonné aux notifications.");
+          console.log("✅ Déjà abonné (v16)");
+        } else {
+          await window.OneSignal.Slidedown.promptPush();
+          console.log("🔔 Prompt affiché (v16)");
+        }
+      } else {
+        const isSubscribed = await window.OneSignal.isPushNotificationsEnabled();
+        if (isSubscribed) {
+          alert("Vous êtes déjà abonné aux notifications.");
+          console.log("✅ Déjà abonné (v15)");
+        } else {
+          await window.OneSignal.showSlidedownPrompt();
+          console.log("🔔 Prompt affiché (v15)");
+        }
+      }
+    } catch (err) {
+      console.warn("❌ Erreur pendant l'abonnement :", err);
+      alert("Une erreur est survenue pendant l'abonnement.");
+    }
+
+    setClicked(false);
+  };
 
   return (
     <button
@@ -34,7 +50,7 @@ const handleClick = async () => {
       disabled={clicked}
       type="button"
     >
-      S’abonner aux notifications
+      🔔 S’abonner aux notifications
     </button>
   );
 }
