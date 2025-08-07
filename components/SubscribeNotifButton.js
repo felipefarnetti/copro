@@ -4,22 +4,28 @@ import { useState } from "react";
 export default function SubscribeNotifButton() {
   const [clicked, setClicked] = useState(false);
 
-  const handleClick = async () => {
-    setClicked(true);
-    // Ne refait PAS OneSignal.init ici !
-    if (
-      window.OneSignal &&
-      window.OneSignal.Slidedown &&
-      window.OneSignal.Slidedown.promptPush
-    ) {
-      await window.OneSignal.Slidedown.promptPush();
-    } else {
-      alert(
-        "OneSignal n'est pas encore prêt ou non supporté par ce navigateur."
-      );
+const handleClick = async () => {
+  setClicked(true);
+
+  if (window.OneSignal?.User?.PushSubscription) {
+    try {
+      const isEnabled = await window.OneSignal.User.PushSubscription.optedIn;
+      if (isEnabled) {
+        console.log("🔕 Déjà inscrit aux notifications");
+        alert("Vous êtes déjà abonné aux notifications.");
+      } else {
+        await window.OneSignal.Slidedown.promptPush();
+        console.log("🔔 Demande d'abonnement forcée");
+      }
+    } catch (e) {
+      console.warn("❌ Erreur lors du prompt :", e);
     }
-    setClicked(false);
-  };
+  } else {
+    alert("OneSignal n'est pas encore prêt ou non supporté par ce navigateur.");
+  }
+
+  setClicked(false);
+};
 
   return (
     <button
