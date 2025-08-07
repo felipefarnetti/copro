@@ -2,7 +2,7 @@
 import { useEffect } from "react";
 
 function isMobileBrowser() {
-  return true; // ← temporairement pour test desktop
+  return true; // temporairement true pour tests sur desktop
 }
 
 export default function OneSignalMobileOnly({ email }) {
@@ -31,22 +31,20 @@ export default function OneSignalMobileOnly({ email }) {
           });
           console.log("✅ OneSignal initialisé");
 
-          // Attendre que User soit disponible
-          const checkUserReady = async (attempts = 10) => {
-            for (let i = 0; i < attempts; i++) {
-              if (OneSignal.User?.setExternalUserId) {
-                console.log("📥 Enregistrement email OneSignal :", email);
-                await OneSignal.User.setExternalUserId(email);
-                return;
-              }
-              console.log("⏳ Attente User.setExternalUserId...");
-              await new Promise((r) => setTimeout(r, 500));
-            }
-            console.warn("❌ OneSignal.User.setExternalUserId indisponible après attente");
-          };
+          // Affiche le prompt si pas encore inscrit
+          const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
+          if (!isOptedIn) {
+            console.log("🔔 Prompt d'inscription affiché");
+            await OneSignal.Slidedown.promptPush();
+          }
 
-          if (email) {
-            await checkUserReady();
+          // Après souscription, on peut associer l'email
+          const isNowOptedIn = await OneSignal.User.PushSubscription.optedIn;
+          if (isNowOptedIn && OneSignal.User?.setExternalUserId) {
+            await OneSignal.User.setExternalUserId(email);
+            console.log("📥 Email associé à OneSignal :", email);
+          } else {
+            console.warn("⛔ Impossible d’associer l’email, utilisateur non abonné");
           }
         } catch (err) {
           console.warn("⚠️ OneSignal init error:", err);
