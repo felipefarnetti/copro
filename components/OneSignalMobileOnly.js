@@ -1,8 +1,10 @@
 "use client";
 import { useEffect } from "react";
 
+// Détection mobile
 function isMobileBrowser() {
-  return true; // temporairement true pour tests sur desktop
+  if (typeof navigator === "undefined") return false;
+  return /android|iphone|ipad|ipod|windows phone/i.test(navigator.userAgent);
 }
 
 export default function OneSignalMobileOnly({ email }) {
