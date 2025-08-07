@@ -111,8 +111,9 @@ export default function AdminDashboard() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
+
+{user?.email && <OneSignalMobileOnly email={user.email} />}
 {user?.email && <NotifStatusIcon />}
-      {user && <OneSignalMobileOnly email={user.email} />}
       <div className="w-full max-w-3xl">
         <div className="flex flex-col items-center mb-8 gap-4">
           <h1 className="text-lg sm:text-3xl font-bold text-white drop-shadow text-center w-full">

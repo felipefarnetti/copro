@@ -44,16 +44,17 @@ export default function NotifStatusIcon() {
   }, []);
 
   const handleClick = async () => {
+      console.log("🔘 Icône cliquée");
     if (!isReady) {
       alert("OneSignal n’est pas encore prêt");
       return;
     }
-
+  console.log("🔔 Ouverture du prompt d'abonnement...");
     try {
       await window.OneSignal.Slidedown.promptPush();
       await checkSubscription();
     } catch (e) {
-      console.error("❌ Erreur prompt :", e);
+    console.error("❌ Erreur d'abonnement :", e);
     }
   };
 
