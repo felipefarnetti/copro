@@ -1,16 +1,15 @@
-// Dashboard utilisateur 
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
 import OneSignalMobileOnly from "../../components/OneSignalMobileOnly";
-import NotifStatusIcon from "../../components/NotifStatusIcon"; // adapte le chemin
+import NotifStatusIcon from "../../components/NotifStatusIcon";
 import dayjs from "dayjs";
 
 function diffHeures(hDebut, hFin) {
   if (!hDebut || !hFin) return 0;
-  const [h1, m1] = hDebut.split(":" ).map(Number);
-  const [h2, m2] = hFin.split(":" ).map(Number);
+  const [h1, m1] = hDebut.split(":").map(Number);
+  const [h2, m2] = hFin.split(":").map(Number);
   return ((h2 + m2 / 60) - (h1 + m1 / 60)) > 0 ? ((h2 + m2 / 60) - (h1 + m1 / 60)) : 0;
 }
 
@@ -72,7 +71,6 @@ export default function Dashboard() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [infos, setInfos] = useState([]);
-  const [isNotifActive, setIsNotifActive] = useState(false);
   const router = useRouter();
 
   const fetchProblems = (token) => {
@@ -108,17 +106,6 @@ export default function Dashboard() {
 
     fetchProblems(token);
     fetch("/api/infos").then(res => res.json()).then(setInfos);
-
-    // Vérifie souscription notifications
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async function (OneSignal) {
-      try {
-        const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
-        setIsNotifActive(isOptedIn);
-      } catch (e) {
-        console.warn("⚠️ Impossible de vérifier souscription utilisateur", e);
-      }
-    });
   }, []);
 
   const handleSubmit = async (e) => {
@@ -160,22 +147,25 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
-{<OneSignalMobileOnly />}
+      <OneSignalMobileOnly />
 
       <div className="flex justify-between mb-4 items-center w-full max-w-4xl">
         <h1 className="text-lg text-white sm:text-2xl font-bold">
           Bienvenue, {user?.prenom && user?.nom ? `${user.prenom} ${user.nom}` : user?.email}
           <span className="block text-sm font-normal text-white">{user?.email}</span>
         </h1>
-       <div className="flex justify-between items-center w-full">
-  <h1 className="text-lg sm:text-2xl font-bold text-white">...</h1>
-  <div className="flex items-center gap-3">
-{<NotifStatusIcon />}
-    <button onClick={handleLogout}
-    className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-xs sm:text-base"
->Déconnexion</button>
-  </div>
-</div>
+        <div className="flex justify-between items-center w-full">
+          <h1 className="text-lg sm:text-2xl font-bold text-white">...</h1>
+          <div className="flex items-center gap-3">
+            <NotifStatusIcon />
+            <button
+              onClick={handleLogout}
+              className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-xs sm:text-base"
+            >
+              Déconnexion
+            </button>
+          </div>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="mb-8">
@@ -190,6 +180,7 @@ export default function Dashboard() {
         {success && <p className="text-green-600 mt-2">{success}</p>}
         {error && <p className="text-red-600 mt-2">{error}</p>}
       </form>
+
       <h2 className="text-xl text-white mb-2 font-semibold">Mes problèmes signalés</h2>
       <ul className="space-y-2">
         {myProblems.length === 0 && (
@@ -199,6 +190,7 @@ export default function Dashboard() {
           <ProblemCard key={p._id || i} problem={p} refreshProblems={() => fetchProblems(localStorage.getItem("token"))} />
         ))}
       </ul>
+
       <hr className="my-6 border-gray-500" />
       <h2 className="text-xl text-white mb-2 font-semibold">Problèmes signalés par les autres</h2>
       <ul className="space-y-2">
@@ -213,35 +205,33 @@ export default function Dashboard() {
               <span className="font-medium text-blue-700">Description :</span>{" "}
               <span className="text-gray-800">{p.description}</span>
             </div>
-           <span
-            className={
-              "capitalize font-bold px-2 py-0.5 rounded text-xs mt-1 inline-block " +
-              (p.statut === "supprimé"
-                ? "text-red-700 bg-red-50 border border-red-200"
-                : p.statut === "solutionné"
-                ? "text-green-700 bg-green-50 border border-green-200"
+            <span
+              className={
+                "capitalize font-bold px-2 py-0.5 rounded text-xs mt-1 inline-block " +
+                (p.statut === "supprimé"
+                  ? "text-red-700 bg-red-50 border border-red-200"
+                  : p.statut === "solutionné"
+                  ? "text-green-700 bg-green-50 border border-green-200"
+                  : p.statut === "pris en compte"
+                  ? "text-yellow-700 bg-yellow-50 border border-yellow-200"
+                  : "text-blue-700 bg-blue-50 border border-blue-200")
+              }
+            >
+              {p.statut === "nouveau"
+                ? "Nouveau"
                 : p.statut === "pris en compte"
-                ? "text-yellow-700 bg-yellow-50 border border-yellow-200"
-                : "text-blue-700 bg-blue-50 border border-blue-200")
-            }
-          >
-            {p.statut === "nouveau"
-              ? "Nouveau"
-              : p.statut === "pris en compte"
-              ? "Pris en compte"
-              : p.statut === "solutionné"
-              ? "Solutionné"
-              : p.statut}
-          </span>
+                ? "Pris en compte"
+                : p.statut === "solutionné"
+                ? "Solutionné"
+                : p.statut}
+            </span>
             <span className="text-xs text-gray-400 block">Par Habitant: Utilisateur</span>
           </li>
         ))}
       </ul>
+
       <h2 className="text-xl text-white mt-8 mb-2 font-semibold">Infos générales</h2>
-      
-      {/* -------- Affichage activités -------- */}
       <ActivitesPublic />
-      {/* -------- Fin activités -------- */}
     </main>
   );
 }
