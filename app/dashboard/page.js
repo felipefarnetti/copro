@@ -171,7 +171,9 @@ export default function Dashboard() {
   <h1 className="text-lg sm:text-2xl font-bold text-white">...</h1>
   <div className="flex items-center gap-3">
     <NotifStatusIcon />
-    <button onClick={handleLogout}>Déconnexion</button>
+    <button onClick={handleLogout}
+    className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-xs sm:text-base"
+>Déconnexion</button>
   </div>
 </div>
       </div>
