@@ -1,11 +1,8 @@
 "use client";
 import { useEffect } from "react";
 
-// Détection mobile
-function isMobileBrowser() {
-  if (typeof navigator === "undefined") return false;
-  return /android|iphone|ipad|ipod|windows phone/i.test(navigator.userAgent);
-}
+// Pour tests uniquement (forcer mobile)
+const isMobileBrowser = () => true;
 
 export default function OneSignalMobileOnly({ email }) {
   useEffect(() => {
@@ -33,23 +30,30 @@ export default function OneSignalMobileOnly({ email }) {
           });
           console.log("✅ OneSignal initialisé");
 
-          // Affiche le prompt si pas encore inscrit
+          // Si pas encore abonné, proposer le prompt
           const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
           if (!isOptedIn) {
-            console.log("🔔 Prompt d'inscription affiché");
+            console.log("🔔 Affichage du prompt d'abonnement");
             await OneSignal.Slidedown.promptPush();
           }
 
-          // Après souscription, on peut associer l'email
-          const isNowOptedIn = await OneSignal.User.PushSubscription.optedIn;
-          if (isNowOptedIn && OneSignal.User?.setExternalUserId) {
-            await OneSignal.User.setExternalUserId(email);
-            console.log("📥 Email associé à OneSignal :", email);
-          } else {
-            console.warn("⛔ Impossible d’associer l’email, utilisateur non abonné");
+          // Réessaie jusqu'à 10 fois pour setExternalUserId
+          let attempts = 0;
+          while (!OneSignal.User?.setExternalUserId && attempts < 10) {
+            console.log("⏳ Attente User.setExternalUserId... (tentative", attempts + 1, ")");
+            await new Promise(res => setTimeout(res, 1000));
+            attempts++;
           }
-        } catch (err) {
-          console.warn("⚠️ OneSignal init error:", err);
+
+          if (OneSignal.User?.setExternalUserId) {
+            await OneSignal.User.setExternalUserId(email);
+            console.log("📥 externalUserId enregistré :", email);
+          } else {
+            console.warn("❌ Impossible de définir setExternalUserId après 10 tentatives");
+          }
+
+        } catch (e) {
+          console.error("❌ OneSignal init error:", e);
         }
       });
     };
