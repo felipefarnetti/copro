@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { Bell, BellOff, CheckCircle, Loader } from "lucide-react";
+import { BellOff, CheckCircle, Loader } from "lucide-react";
 
 export default function NotifStatusIcon() {
   const [ready, setReady] = useState(false);
