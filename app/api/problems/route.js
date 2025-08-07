@@ -66,7 +66,22 @@ export async function POST(req) {
     };
     const result = await db.collection("problems").insertOne(doc);
     doc._id = result.insertedId;
-    return NextResponse.json(doc);
+
+    // 🔔 Envoi de notification OneSignal via API interne
+    try {
+      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/notify`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: "🆕 Nouveau problème signalé",
+          message: doc.description
+        })
+      });
+    } catch (e) {
+      console.error("Erreur lors de l'envoi de la notification :", e);
+    }
+
+    return NextResponse.json(doc); // ✅ bonne réponse ici
   } catch (e) {
     console.error("Erreur POST /api/problems:", e);
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });

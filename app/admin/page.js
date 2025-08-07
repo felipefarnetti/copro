@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
 import NotificationPanel from "../../components/NotificationPanel";
 import Link from "next/link";
+import OneSignal from 'react-onesignal';
+
 
 export default function AdminDashboard() {
   const [user, setUser] = useState(null);
@@ -22,14 +24,20 @@ export default function AdminDashboard() {
   });
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) { router.push("/"); return; }
-    const payload = JSON.parse(atob(token.split(".")[1]));
-    if (payload.role !== "admin") { router.push("/dashboard"); return; }
-    setUser(payload);
-    fetchProblems(token);
-  }, []);
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (!token) { router.push("/"); return; }
+
+  const payload = JSON.parse(atob(token.split(".")[1]));
+  if (payload.role !== "admin") { router.push("/dashboard"); return; }
+  setUser(payload);
+
+  // 🟢 Associer l'utilisateur connecté à son ID OneSignal (email = External ID)
+  if (payload.email) {
+    OneSignal.setExternalUserId(payload.email);
+  }
+  fetchProblems(token);
+}, []);
 
   const fetchProblems = (token) => {
     fetch("/api/problems", { headers: { Authorization: `Bearer ${token}` } })
