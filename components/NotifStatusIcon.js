@@ -6,71 +6,60 @@ export default function NotifStatusIcon() {
   const [isReady, setIsReady] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(null);
 
-  const className = "w-6 h-6 cursor-pointer transition hover:scale-110";
+  const waitUntilReady = async () => {
+    return new Promise((resolve, reject) => {
+      let tries = 0;
+      const maxTries = 15;
+
+      const check = () => {
+        tries++;
+        if (window.OneSignal?.User?.PushSubscription) {
+          resolve(true);
+        } else if (tries >= maxTries) {
+          reject("❌ OneSignal non prêt");
+        } else {
+          setTimeout(check, 500);
+        }
+      };
+      check();
+    });
+  };
 
   const checkSubscription = async () => {
-    try {
-      const pushStatus = window?.OneSignal?.User?.PushSubscription;
-      if (pushStatus) {
-        const optedIn = await pushStatus.optedIn;
-        setIsSubscribed(optedIn);
-        console.log("🔍 Statut abonnement :", optedIn);
-      } else {
-        console.warn("⏳ PushSubscription non disponible");
-        setIsSubscribed(false);
-      }
-    } catch (e) {
-      console.error("❌ Erreur lors du checkSubscription :", e);
-      setIsSubscribed(false);
-    }
+    const optedIn = await window.OneSignal.User.PushSubscription.optedIn;
+    setIsSubscribed(optedIn);
   };
 
   useEffect(() => {
-    if (!window?.OneSignal) return;
-
-    console.log("🔄 Détection OneSignal…");
-    window.OneSignalDeferred = window.OneSignalDeferred || [];
-    window.OneSignalDeferred.push(async function (OneSignal) {
-      console.log("🟢 OneSignal prêt dans NotifStatusIcon");
-      setIsReady(true);
-      await checkSubscription();
-    });
+    waitUntilReady()
+      .then(async () => {
+        setIsReady(true);
+        await checkSubscription();
+      })
+      .catch((err) => {
+        console.warn(err);
+        setIsReady(false);
+        setIsSubscribed(null);
+      });
   }, []);
 
   const handleClick = async () => {
-    if (!isReady || !window.OneSignal?.Slidedown) {
-      alert("OneSignal n’est pas prêt");
+    if (!isReady) {
+      alert("OneSignal n’est pas encore prêt");
       return;
     }
 
     try {
-      console.log("🔔 Ouverture du prompt OneSignal");
       await window.OneSignal.Slidedown.promptPush();
       await checkSubscription();
     } catch (e) {
-      console.error("❌ Erreur lors du prompt OneSignal :", e);
+      console.error("❌ Erreur prompt :", e);
     }
   };
 
-  if (isSubscribed === null) {
-    return <Loader className={`${className} animate-spin text-gray-500`} />;
-  }
+  const iconProps = { className: "w-6 h-6 cursor-pointer hover:scale-110 transition" };
 
-  if (isSubscribed) {
-    return (
-      <Bell
-        className={`${className} text-green-500`}
-        title="Notifications activées"
-        onClick={handleClick}
-      />
-    );
-  }
-
-  return (
-    <BellOff
-      className={`${className} text-gray-400`}
-      title="Activer les notifications"
-      onClick={handleClick}
-    />
-  );
+  if (!isReady || isSubscribed === null) return <Loader className="w-6 h-6 animate-spin text-gray-400" />;
+  if (isSubscribed) return <Bell {...iconProps} onClick={handleClick} style={{ color: "green" }} />;
+  return <BellOff {...iconProps} onClick={handleClick} style={{ color: "gray" }} />;
 }
