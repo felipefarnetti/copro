@@ -48,8 +48,8 @@ export default function OneSignalMobileOnly({ email }) {
         console.log("✅ OneSignal initialisé");
 
         try {
-          await OneSignal.Slidedown.promptPush();
-          console.log("🔔 Prompt affiché");
+        //  await OneSignal.Slidedown.promptPush();
+        //  console.log("🔔 Prompt affiché"); 
 
           await OneSignal.User.PushSubscription.optIn();
           console.log("📥 Utilisateur opt-in");

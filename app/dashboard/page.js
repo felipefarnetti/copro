@@ -170,7 +170,7 @@ export default function Dashboard() {
        <div className="flex justify-between items-center w-full">
   <h1 className="text-lg sm:text-2xl font-bold text-white">...</h1>
   <div className="flex items-center gap-3">
-    <NotifStatusIcon />
+{user?.email && <NotifStatusIcon />}
     <button onClick={handleLogout}
     className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-xs sm:text-base"
 >Déconnexion</button>
