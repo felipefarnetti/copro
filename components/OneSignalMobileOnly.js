@@ -9,6 +9,12 @@ function isMobileBrowser() {
 export default function OneSignalMobileOnly() {
   useEffect(() => {
     if (!isMobileBrowser()) return;
+    
+        const token = localStorage.getItem("token");
+    if (!token) return;
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    const userEmail = payload?.email;
 
     // Injecter SDK v16 dynamiquement
     const script = document.createElement("script");
@@ -22,7 +28,15 @@ export default function OneSignalMobileOnly() {
         await OneSignal.init({
           appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
         });
-   await OneSignal.Slidedown.promptPush();
+        // 🟢 Demande l'autorisation push
+        await OneSignal.Slidedown.promptPush();
+        
+// 🟢 Définit l'externalUserId proprement (v16)
+        if (userEmail) {
+          await OneSignal.User.setExternalUserId(userEmail);
+          console.log("✅ ExternalUserId enregistré :", userEmail);
+        }
+
       });
     };
 
