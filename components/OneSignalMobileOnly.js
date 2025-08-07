@@ -1,5 +1,5 @@
 "use client";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 function isMobileBrowser() {
   if (typeof navigator === "undefined") return false;
@@ -7,15 +7,27 @@ function isMobileBrowser() {
 }
 
 export default function OneSignalMobileOnly({ email }) {
+  const initializedRef = useRef(false); // évite double init
+
   useEffect(() => {
-    console.log("📲 OneSignalMobileOnly useEffect déclenché");
+    console.log("📲 useEffect déclenché - email :", email);
 
     if (!isMobileBrowser()) {
       console.log("📵 Navigateur non mobile : OneSignal ignoré");
       return;
     }
 
-    console.log("📦 Injection du script OneSignal v16...");
+    if (!email) {
+      console.log("⏳ Email non encore disponible, on attend...");
+      return; // stop ici tant que l'email n'est pas dispo
+    }
+
+    if (initializedRef.current) {
+      console.log("🔁 OneSignal déjà initialisé");
+      return;
+    }
+
+    initializedRef.current = true; // on bloque les futures initialisations
 
     const script = document.createElement("script");
     script.src = "https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js";
@@ -23,7 +35,7 @@ export default function OneSignalMobileOnly({ email }) {
     document.head.appendChild(script);
 
     script.onload = () => {
-      console.log("✅ Script OneSignal v16 chargé");
+      console.log("✅ Script OneSignal chargé");
       window.OneSignalDeferred = window.OneSignalDeferred || [];
 
       window.OneSignalDeferred.push(async function (OneSignal) {
@@ -33,34 +45,26 @@ export default function OneSignalMobileOnly({ email }) {
           appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
         });
 
-        console.log("✅ OneSignal initialisé avec succès");
-
-        await OneSignal.Slidedown.promptPush();
-        console.log("🔔 Demande de permission affichée");
+        console.log("✅ OneSignal initialisé");
 
         try {
-          await OneSignal.User.PushSubscription.optIn();
-          console.log("✅ Utilisateur opt-in aux notifications");
-        } catch (error) {
-          console.warn("⚠️ Erreur opt-in :", error);
-        }
+          await OneSignal.Slidedown.promptPush();
+          console.log("🔔 Prompt affiché");
 
-        if (email) {
-          try {
-            await OneSignal.User.setExternalUserId(email);
-            console.log("🟢 Utilisateur lié à OneSignal :", email);
-          } catch (error) {
-            console.warn("❗ OneSignal.User.setExternalUserId non disponible ou erreur :", error);
-          }
-        } else {
-          console.warn("⚠️ Aucun email fourni pour setExternalUserId");
+          await OneSignal.User.PushSubscription.optIn();
+          console.log("📥 Utilisateur opt-in");
+
+          await OneSignal.User.setExternalUserId(email);
+          console.log("📧 externalUserId enregistré :", email);
+        } catch (err) {
+          console.warn("❌ Erreur dans l'enregistrement OneSignal :", err);
         }
       });
     };
 
     return () => {
-      console.log("♻️ Script OneSignal retiré du DOM (cleanup)");
       document.head.removeChild(script);
+      console.log("♻️ Script OneSignal retiré");
     };
   }, [email]);
 

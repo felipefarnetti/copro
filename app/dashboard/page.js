@@ -1,15 +1,16 @@
+// Dashboard utilisateur (modifié pour afficher l'état OneSignal)
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
+import OneSignalMobileOnly from "../../components/OneSignalMobileOnly";
 import dayjs from "dayjs";
 
-// -------- Composant affichage activités --------
 function diffHeures(hDebut, hFin) {
   if (!hDebut || !hFin) return 0;
-  const [h1, m1] = hDebut.split(":").map(Number);
-  const [h2, m2] = hFin.split(":").map(Number);
-  return ((h2 + m2/60) - (h1 + m1/60)) > 0 ? ((h2 + m2/60) - (h1 + m1/60)) : 0;
+  const [h1, m1] = hDebut.split(":" ).map(Number);
+  const [h2, m2] = hFin.split(":" ).map(Number);
+  return ((h2 + m2 / 60) - (h1 + m1 / 60)) > 0 ? ((h2 + m2 / 60) - (h1 + m1 / 60)) : 0;
 }
 
 function ActivitesPublic() {
@@ -21,12 +22,10 @@ function ActivitesPublic() {
       .then(data => setActivites(data));
   }, []);
 
- // Date actuelle
   const now = new Date();
   const mois = now.getMonth();
   const annee = now.getFullYear();
 
-  // Total heures du mois en cours
   const totalHeuresMois = activites
     .filter(a => {
       const d = new Date(a.date);
@@ -34,20 +33,18 @@ function ActivitesPublic() {
     })
     .reduce((sum, a) => sum + diffHeures(a.heureDebut, a.heureFin), 0);
 
-  // Total heures de l'année en cours
   const totalHeuresAnnee = activites
     .filter(a => {
       const d = new Date(a.date);
       return d.getFullYear() === annee;
     })
     .reduce((sum, a) => sum + diffHeures(a.heureDebut, a.heureFin), 0);
- return (
+
+  return (
     <div className="bg-white/90 border border-blue-100 p-5 mt-2 rounded-xl">
       <h2 className="text-lg font-semibold mb-3 text-blue-700">Activités réalisées dans la copropriété</h2>
       <div className="mb-3 font-bold">
-        Total des heures ce mois&nbsp;: <span className="text-blue-800">{totalHeuresMois.toLocaleString(undefined, { maximumFractionDigits: 2 })} h</span>
-        {" / "}
-        Année&nbsp;: <span className="text-blue-800">{totalHeuresAnnee.toLocaleString(undefined, { maximumFractionDigits: 2 })} h</span>
+        Total des heures ce mois : <span className="text-blue-800">{totalHeuresMois.toFixed(2)} h</span> / Année : <span className="text-blue-800">{totalHeuresAnnee.toFixed(2)} h</span>
       </div>
       <ul className="space-y-2">
         {activites.length === 0 && <li className="text-gray-400 italic">Aucune activité pour l’instant.</li>}
@@ -57,7 +54,7 @@ function ActivitesPublic() {
             <div className="text-xs text-gray-600">
               {a.date ? new Date(a.date).toLocaleDateString() : ""}
               {a.heureDebut && a.heureFin
-                ? ` | ${a.heureDebut} → ${a.heureFin} (${diffHeures(a.heureDebut, a.heureFin).toLocaleString(undefined, { maximumFractionDigits: 2 })} h)`
+                ? ` | ${a.heureDebut} → ${a.heureFin} (${diffHeures(a.heureDebut, a.heureFin).toFixed(2)} h)`
                 : ""}
             </div>
           </li>
@@ -66,7 +63,6 @@ function ActivitesPublic() {
     </div>
   );
 }
-// -------- Fin composant affichage activités --------
 
 export default function Dashboard() {
   const [user, setUser] = useState(null);
@@ -75,9 +71,9 @@ export default function Dashboard() {
   const [success, setSuccess] = useState("");
   const [error, setError] = useState("");
   const [infos, setInfos] = useState([]);
+  const [isNotifActive, setIsNotifActive] = useState(false);
   const router = useRouter();
 
-  // ---- Ici la fonction fetchProblems est bien déclarée avant le useEffect ----
   const fetchProblems = (token) => {
     fetch("/api/problems", {
       headers: { Authorization: `Bearer ${token}` }
@@ -86,39 +82,43 @@ export default function Dashboard() {
       .then(setProblems);
   };
 
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) {
-    router.push("/");
-    return;
-  }
-  const payload = JSON.parse(atob(token.split(".")[1]));
-  if (payload.role === "admin") {
-    router.push("/admin");
-    return;
-  }
-  setUser(payload); // Pour garder l'email le temps du fetch
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.push("/");
+      return;
+    }
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (payload.role === "admin") {
+      router.push("/admin");
+      return;
+    }
+    setUser(payload);
 
-  // Fetch pour récupérer prenom/nom
-  fetch("/api/users/me", {
-    headers: { Authorization: `Bearer ${token}` }
-  })
-    .then(res => res.json())
-    .then(data => {
-      if (data && data.prenom && data.nom) {
-        setUser(u => ({
-          ...u,
-          prenom: data.prenom,
-          nom: data.nom
-        }));
+    fetch("/api/users/me", {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.prenom && data.nom) {
+          setUser(u => ({ ...u, prenom: data.prenom, nom: data.nom }));
+        }
+      });
+
+    fetchProblems(token);
+    fetch("/api/infos").then(res => res.json()).then(setInfos);
+
+    // Vérifie souscription notifications
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function (OneSignal) {
+      try {
+        const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
+        setIsNotifActive(isOptedIn);
+      } catch (e) {
+        console.warn("⚠️ Impossible de vérifier souscription utilisateur", e);
       }
     });
-
-  fetchProblems(token);
-  fetch("/api/infos")
-    .then(res => res.json())
-    .then(setInfos);
-}, []);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -126,10 +126,7 @@ useEffect(() => {
     const token = localStorage.getItem("token");
     const res = await fetch("/api/problems", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`
-      },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ description: desc })
     });
     const data = await res.json();
@@ -147,21 +144,13 @@ useEffect(() => {
     router.push("/");
   };
 
-  // Filtrage : n'affiche pas les supprimés et solutionnés de +3 mois
   const now = dayjs();
   const myProblems = problems.filter(p => {
     if (p.userId !== user?.id) return false;
     if (p.statut === "supprimé") return false;
-    if (
-      p.statut === "solutionné" &&
-      p.dateResolution &&
-      dayjs(now).diff(dayjs(p.dateResolution), "month") >= 3
-    ) {
-      return false;
-    }
+    if (p.statut === "solutionné" && p.dateResolution && dayjs(now).diff(dayjs(p.dateResolution), "month") >= 3) return false;
     return true;
   });
-
   const otherProblems = problems.filter(p =>
     p.userId !== user?.id &&
     p.statut !== "supprimé" &&
@@ -169,21 +158,25 @@ useEffect(() => {
   );
 
   return (
-<main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
-      <div className="flex justify-between mb-4 items-center">
+    <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
+      {user && <OneSignalMobileOnly email={user.email} />}
+
+      <div className="flex justify-between mb-4 items-center w-full max-w-4xl">
         <h1 className="text-lg text-white sm:text-2xl font-bold">
-          Bienvenue,{" "}
-          {user?.prenom && user?.nom
-            ? `${user.prenom} ${user.nom}`
-            : user?.email}
+          Bienvenue, {user?.prenom && user?.nom ? `${user.prenom} ${user.nom}` : user?.email}
           <span className="block text-sm font-normal text-white">{user?.email}</span>
         </h1>
-        <button
-          onClick={handleLogout}
-          className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-sm sm:text-base"
-        >
-          Déconnexion
-        </button>
+        <div className="flex items-center gap-2">
+          {isNotifActive && (
+            <span className="text-green-300 text-sm">🔔 Notifications activées</span>
+          )}
+          <button
+            onClick={handleLogout}
+            className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-sm sm:text-base"
+          >
+            Déconnexion
+          </button>
+        </div>
       </div>
 
       <form onSubmit={handleSubmit} className="mb-8">

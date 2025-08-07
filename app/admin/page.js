@@ -1,3 +1,4 @@
+// AdminDashboard - page.js
 "use client";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -11,6 +12,7 @@ export default function AdminDashboard() {
   const [problems, setProblems] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [successMsg, setSuccessMsg] = useState("");
+  const [isNotifActive, setIsNotifActive] = useState(false);
   const [newUser, setNewUser] = useState({
     prenom: "",
     nom: "",
@@ -23,16 +25,27 @@ export default function AdminDashboard() {
   });
   const router = useRouter();
 
-useEffect(() => {
-  const token = localStorage.getItem("token");
-  if (!token) { router.push("/"); return; }
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) { router.push("/"); return; }
 
-  const payload = JSON.parse(atob(token.split(".")[1]));
-  if (payload.role !== "admin") { router.push("/dashboard"); return; }
-  setUser(payload);
+    const payload = JSON.parse(atob(token.split(".")[1]));
+    if (payload.role !== "admin") { router.push("/dashboard"); return; }
 
-  fetchProblems(token);
-}, []);
+    setUser(payload);
+    fetchProblems(token);
+
+    // Vérifie l’état de souscription aux notifications
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function (OneSignal) {
+      try {
+        const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
+        setIsNotifActive(isOptedIn);
+      } catch (e) {
+        console.warn("⚠️ Impossible de vérifier l'état OneSignal");
+      }
+    });
+  }, []);
 
   const fetchProblems = (token) => {
     fetch("/api/problems", { headers: { Authorization: `Bearer ${token}` } })
@@ -40,7 +53,6 @@ useEffect(() => {
       .then(data => setProblems(data || []));
   };
 
-  // Créer un utilisateur
   const handleCreateUser = async (e) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -51,16 +63,7 @@ useEffect(() => {
     });
     if (res.ok) {
       setShowModal(false);
-      setNewUser({
-        prenom: "",
-        nom: "",
-        email: "",
-        telephone: "",
-        batiment: "",
-        appartement: "",
-        role: "copro",
-        password: "",
-      });
+      setNewUser({ prenom: "", nom: "", email: "", telephone: "", batiment: "", appartement: "", role: "copro", password: "" });
       setSuccessMsg("Utilisateur créé avec succès !");
       setTimeout(() => setSuccessMsg(""), 4000);
     } else {
@@ -70,7 +73,6 @@ useEffect(() => {
     }
   };
 
-  // Problèmes avec notification auto selon le statut
   const handleSetStatus = async (id, status) => {
     const token = localStorage.getItem("token");
     let body = { statut: status };
@@ -83,7 +85,6 @@ useEffect(() => {
     });
     fetchProblems(token);
 
-    // Notification auto
     let notifAutoMsg = "";
     if (status === "solutionné") {
       notifAutoMsg = "Un problème signalé a été résolu par le syndic.";
@@ -94,10 +95,7 @@ useEffect(() => {
       await fetch("/api/notify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: "Info Problème",
-          message: notifAutoMsg,
-        }),
+        body: JSON.stringify({ title: "Info Problème", message: notifAutoMsg }),
       });
     }
   };
@@ -107,19 +105,22 @@ useEffect(() => {
     router.push("/");
   };
 
-  // Navigation
   const goToTodoSyndic = () => router.push("/admin/todo-syndic");
   const goToActivites = () => router.push("/admin/activites");
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
-            {user && <OneSignalMobileOnly email={user.email} />}
+      {user && <OneSignalMobileOnly email={user.email} />}
       <div className="w-full max-w-3xl">
         <div className="flex flex-col items-center mb-8 gap-4">
-          {/* Titre centré */}
           <h1 className="text-lg sm:text-3xl font-bold text-white drop-shadow text-center w-full">
             Dashboard Admin
           </h1>
+          {isNotifActive && (
+            <div className="text-sm text-green-200 font-semibold">
+              🔔 Notifications activées
+            </div>
+          )}
           {/* Boutons en 2 lignes de 3, centrés */}
           <div className="flex flex-col gap-2 w-full items-center">
             <div className="flex flex-wrap gap-2 justify-center w-full">
