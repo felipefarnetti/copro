@@ -2,7 +2,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
-import OneSignalMobileOnly from "../../components/OneSignalMobileOnly";
 import NotifStatusIcon from "../../components/NotifStatusIcon";
 import dayjs from "dayjs";
 
@@ -147,7 +146,6 @@ export default function Dashboard() {
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
-      <OneSignalMobileOnly />
 
       <div className="flex justify-between mb-4 items-center w-full max-w-4xl">
         <h1 className="text-lg text-white sm:text-2xl font-bold">

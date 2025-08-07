@@ -22,7 +22,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {/* ✅ Appelle sans prop email */}
-      
+              <OneSignalMobileOnly />
         {children}
       </body>
     </html>
