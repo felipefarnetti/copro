@@ -1,21 +1,16 @@
 "use client";
 import { useEffect } from "react";
 
+// Détection mobile
 const isMobileBrowser = () => {
   if (typeof navigator === "undefined") return false;
   return /android|iphone|ipad|ipod|windows phone/i.test(navigator.userAgent);
 };
 
-export default function OneSignalMobileOnly({ email }) {
+export default function OneSignalMobileOnly() {
   useEffect(() => {
-    if (!email || !isMobileBrowser()) {
-      console.log("⏳ OneSignalMobileOnly attend un email...", email);
-      return;
-    }
-
-    // Ne pas injecter si déjà présent
-    if (window.OneSignal) {
-      console.warn("⚠️ SDK déjà injecté, on saute");
+    if (!isMobileBrowser()) {
+      console.log("📵 Navigateur non mobile – OneSignal ignoré");
       return;
     }
 
@@ -33,20 +28,14 @@ export default function OneSignalMobileOnly({ email }) {
         console.log("🟢 OneSignal prêt dans Deferred");
 
         try {
-          // Initialisation si non déjà faite
-          if (!OneSignal._initCalled) {
-            await OneSignal.init({ appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83" });
-            console.log("✅ OneSignal initialisé");
-          } else {
-            console.log("♻️ OneSignal déjà initialisé, on saute init");
-          }
+          await OneSignal.init({
+            appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83",
+          });
+          console.log("✅ OneSignal initialisé");
 
-          // Vérifie si l'utilisateur est déjà abonné
           const isOptedIn = await OneSignal.User.PushSubscription.optedIn;
-          console.log("🔍 Déjà abonné ?", isOptedIn);
-
           if (!isOptedIn) {
-            console.log("🔔 Affichage du prompt");
+            console.log("🔔 Affichage du prompt d'abonnement");
             await OneSignal.Slidedown.promptPush();
           }
 
@@ -59,7 +48,7 @@ export default function OneSignalMobileOnly({ email }) {
     return () => {
       document.head.removeChild(script);
     };
-  }, [email]);
+  }, []);
 
   return null;
 }
