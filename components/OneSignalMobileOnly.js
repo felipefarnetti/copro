@@ -4,7 +4,7 @@ import { useEffect } from "react";
 export default function OneSignalMobileOnly({ email }) {
   useEffect(() => {
     if (!email) {
-      console.log("⏳ OneSignalMobileOnly attend un email...");
+      console.log("⏳ OneSignalMobileOnly attend un email...", email);
       return;
     }
 
@@ -15,6 +15,8 @@ export default function OneSignalMobileOnly({ email }) {
 
     script.onload = () => {
       window.OneSignalDeferred = window.OneSignalDeferred || [];
+      console.log("🟢 OneSignal prêt dans Deferred");
+
       window.OneSignalDeferred.push(async function (OneSignal) {
         try {
           await OneSignal.init({ appId: "2a6dc7fc-1f0e-4f6c-9218-8b7addca1b83" });
