@@ -166,17 +166,13 @@ export default function Dashboard() {
           Bienvenue, {user?.prenom && user?.nom ? `${user.prenom} ${user.nom}` : user?.email}
           <span className="block text-sm font-normal text-white">{user?.email}</span>
         </h1>
-        <div className="flex items-center gap-2">
-          {isNotifActive && (
-            <span className="text-green-300 text-sm">🔔 Notifications activées</span>
-          )}
-          <button
-            onClick={handleLogout}
-            className="bg-blue-700 hover:bg-blue-800 text-white font-semibold px-3 py-1 rounded-xl shadow transition text-sm sm:text-base"
-          >
-            Déconnexion
-          </button>
-        </div>
+       <div className="flex justify-between items-center w-full">
+  <h1 className="text-lg sm:text-2xl font-bold text-white">...</h1>
+  <div className="flex items-center gap-3">
+    <NotifStatusIcon />
+    <button onClick={handleLogout}>Déconnexion</button>
+  </div>
+</div>
       </div>
 
       <form onSubmit={handleSubmit} className="mb-8">

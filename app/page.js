@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import SubscribeNotifButton from "../components/SubscribeNotifButton";
+import NotifStatusIcon from "../../components/NotifStatusIcon"; // adapte le chemin
+
 
 export default function Home() {
   const [email, setEmail] = useState("");
@@ -28,6 +29,7 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-blue-100 to-blue-300 px-2">
       {/* Titre général */}
+        <NotifStatusIcon />
       <h1 className="text-3xl sm:text-4xl font-extrabold text-blue-800 mb-8 drop-shadow text-center">
         Gestion de Copropriété
       </h1>
@@ -42,7 +44,6 @@ export default function Home() {
           <Link href="/register" className="text-blue-700 font-semibold underline text-xs sm:text-sm">Créer un compte</Link>
         </div>
       </form>
-          <SubscribeNotifButton />
     </main>
   );
 }

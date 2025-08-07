@@ -1,70 +1,59 @@
 "use client";
 import { useEffect, useState } from "react";
+import { Bell, BellOff, CheckCircle, Loader } from "lucide-react";
 
 export default function NotifStatusIcon() {
-  const [status, setStatus] = useState("loading"); // 'loading' | 'enabled' | 'disabled' | 'error'
+  const [ready, setReady] = useState(false);
+  const [enabled, setEnabled] = useState(null); // null = loading
 
   useEffect(() => {
-    let interval;
     const checkStatus = async () => {
-      if (!window.OneSignal || !window.OneSignal.User?.PushSubscription) {
+      if (!window?.OneSignal?.User?.PushSubscription) {
+        setReady(false);
         return;
       }
-
-      try {
-        const isSubscribed = await window.OneSignal.User.PushSubscription.optedIn;
-        setStatus(isSubscribed ? "enabled" : "disabled");
-      } catch (err) {
-        console.warn("Erreur check OneSignal:", err);
-        setStatus("error");
-      }
+      setReady(true);
+      const isEnabled = await window.OneSignal.User.PushSubscription.optedIn;
+      setEnabled(isEnabled);
     };
 
-    interval = setInterval(() => {
-      if (window.OneSignal?.User?.PushSubscription) {
-        clearInterval(interval);
-        checkStatus();
-      }
-    }, 500);
-
-    return () => clearInterval(interval);
+    // Petit délai pour laisser le SDK se charger
+    setTimeout(checkStatus, 1000);
   }, []);
 
-  const getIcon = () => {
-    switch (status) {
-      case "enabled":
-        return "✅";
-      case "disabled":
-        return "🔔";
-      case "loading":
-        return "⏳";
-      case "error":
-        return "❌";
-      default:
-        return "❓";
+  const handleClick = async () => {
+    if (!ready) {
+      alert("🔄 OneSignal n’est pas encore prêt.");
+      return;
     }
-  };
 
-  const getLabel = () => {
-    switch (status) {
-      case "enabled":
-        return "Notifications activées";
-      case "disabled":
-        return "Notifications désactivées";
-      case "loading":
-        return "Chargement des notifications...";
-      case "error":
-        return "Erreur OneSignal";
-      default:
-        return "Statut inconnu";
+    if (enabled) {
+      alert("🔔 Notifications déjà activées.");
+    } else {
+      try {
+        await window.OneSignal.Slidedown.promptPush();
+        console.log("🔔 Demande d’abonnement affichée");
+      } catch (err) {
+        console.error("❌ Erreur à l’abonnement :", err);
+      }
     }
   };
 
   return (
-    <div className="absolute top-4 right-4 z-50">
-      <div className="text-white text-xl cursor-default" title={getLabel()}>
-        {getIcon()}
-      </div>
-    </div>
+    <button
+      onClick={handleClick}
+      title={
+        enabled === null
+          ? "Chargement du statut..."
+          : enabled
+          ? "Notifications activées"
+          : "Notifications désactivées (cliquer pour activer)"
+      }
+      className="text-white hover:text-yellow-400 transition p-1"
+    >
+      {enabled === null && <Loader className="animate-spin w-6 h-6" />}
+      {enabled === true && <CheckCircle className="w-6 h-6 text-green-400" />}
+      {enabled === false && <BellOff className="w-6 h-6 text-yellow-300" />}
+    </button>
   );
 }
