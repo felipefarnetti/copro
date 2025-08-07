@@ -3,57 +3,47 @@ import { useEffect, useState } from "react";
 import { Bell, BellOff, Loader } from "lucide-react";
 
 export default function NotifStatusIcon() {
-  const [ready, setReady] = useState(false);
-  const [enabled, setEnabled] = useState(null); // null = loading
+  const [isReady, setIsReady] = useState(false);
+  const [isSubscribed, setIsSubscribed] = useState(null);
 
-  useEffect(() => {
-    const checkStatus = async () => {
-      if (!window?.OneSignal?.User?.PushSubscription) {
-        setReady(false);
-        return;
-      }
-      setReady(true);
-      const isEnabled = await window.OneSignal.User.PushSubscription.optedIn;
-      setEnabled(isEnabled);
-    };
-
-    // Petit délai pour laisser le SDK se charger
-    setTimeout(checkStatus, 1000);
-  }, []);
-
-  const handleClick = async () => {
-    if (!ready) {
-      alert("🔄 OneSignal n’est pas encore prêt.");
-      return;
-    }
-
-    if (enabled) {
-      alert("🔔 Notifications déjà activées.");
-    } else {
-      try {
-        await window.OneSignal.Slidedown.promptPush();
-        console.log("🔔 Demande d’abonnement affichée");
-      } catch (err) {
-        console.error("❌ Erreur à l’abonnement :", err);
-      }
+  // Vérifie si l'utilisateur est abonné
+  const checkSubscription = async () => {
+    if (window?.OneSignal?.User?.PushSubscription) {
+      const optedIn = await window.OneSignal.User.PushSubscription.optedIn;
+      setIsSubscribed(optedIn);
     }
   };
 
-  return (
-    <button
-      onClick={handleClick}
-      title={
-        enabled === null
-          ? "Chargement du statut..."
-          : enabled
-          ? "Notifications activées"
-          : "Notifications désactivées (cliquer pour activer)"
-      }
-      className="text-white hover:text-yellow-400 transition p-1"
-    >
-      {enabled === null && <Loader className="animate-spin w-6 h-6" />}
-      {enabled === true && <Bell className="w-5 h-5 text-green-500" />}
-      {enabled === false && <BellOff className="w-6 h-6 text-yellow-300" />}
-    </button>
-  );
+  useEffect(() => {
+    if (!window?.OneSignal) return;
+    console.log("🔄 OneSignal détecté");
+
+    window.OneSignalDeferred = window.OneSignalDeferred || [];
+    window.OneSignalDeferred.push(async function (OneSignal) {
+      console.log("🟢 OneSignal prêt");
+      setIsReady(true);
+      await checkSubscription();
+    });
+  }, []);
+
+  const handleClick = async () => {
+    if (!isReady || !window.OneSignal?.Slidedown) {
+      alert("OneSignal n’est pas prêt");
+      return;
+    }
+
+    console.log("🔔 Ouverture du prompt d'abonnement...");
+    try {
+      await window.OneSignal.Slidedown.promptPush();
+      await checkSubscription();
+    } catch (e) {
+      console.error("❌ Erreur d'abonnement :", e);
+    }
+  };
+
+  const className = "w-6 h-6 cursor-pointer transition hover:scale-110";
+
+  if (isSubscribed === null) return <Loader className={className + " animate-spin text-gray-500"} />;
+  if (isSubscribed) return <Bell className={className + " text-green-500"} onClick={handleClick} />;
+  return <BellOff className={className + " text-gray-400"} onClick={handleClick} />;
 }
