@@ -82,38 +82,22 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleSetStatus = async (id, status) => {
-    const token = localStorage.getItem("token");
-    let body = { statut: status };
-    if (status === "solutionné") body.dateResolution = new Date();
-    if (status === "supprimé") body.dateSuppression = new Date();
-    await fetch(`/api/problems/${id}`, {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify(body),
-    });
-    fetchProblems(token);
+// Problèmes avec notification auto selon le statut
+const handleSetStatus = async (id, status) => {
+  const token = localStorage.getItem("token");
+  let body = { statut: status };
+  if (status === "solutionné") body.dateResolution = new Date();
+  if (status === "supprimé") body.dateSuppression = new Date();
 
-    let notifAutoMsg = "";
-    if (status === "solutionné") {
-      notifAutoMsg = "Un problème signalé a été résolu par le syndic.";
-    } else if (status === "pris en compte") {
-      notifAutoMsg = "Un problème signalé a été pris en compte par le syndic.";
-    }
-    if (notifAutoMsg) {
-      await fetch("/api/notify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: "Info Problème",
-          message: notifAutoMsg,
-        }),
-      });
-    }
-  };
+  await fetch(`/api/problems/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(body),
+  });
+
+  fetchProblems(token);
+};
+
 
   const handleLogout = () => {
     localStorage.removeItem("token");
