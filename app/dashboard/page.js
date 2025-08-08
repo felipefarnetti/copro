@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ProblemCard from "../../components/ProblemCard";
 import NotifStatusIcon from "../../components/NotifStatusIcon";
+import OneSignalMobileOnly from "../../components/OneSignalMobileOnly";
 import dayjs from "dayjs";
 
 function diffHeures(hDebut, hFin) {
@@ -155,6 +156,8 @@ export default function Dashboard() {
         <div className="flex justify-between items-center w-full">
           <h1 className="text-lg sm:text-2xl font-bold text-white">...</h1>
           <div className="flex items-center gap-3">
+                          <OneSignalMobileOnly />
+            
             <NotifStatusIcon />
             <button
               onClick={handleLogout}
