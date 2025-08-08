@@ -1,7 +1,8 @@
 {
-  "name": "Ma Copro WebApp",
-  "short_name": "CoproApp",
+  "name": "Ma Copro",
+  "short_name": "Ma Copro",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#0a2540",
   "theme_color": "#2563eb",
