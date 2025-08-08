@@ -35,12 +35,13 @@ export async function PUT(req, { params }) {
     const result = await db.collection("problems").updateOne(query, { $set: update });
     if (result.matchedCount === 0) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
 
-    // 🔔 Notification utilisateur (statut changé)
+    // 🔔 Notification utilisateur (statut changé) - Envoi à tous les utilisateurs
     if (statut && ["pris en compte", "solutionné"].includes(statut)) {
       const capitalized =
         statut.charAt(0).toUpperCase() + statut.slice(1).replace("e", "é");
 
       try {
+        // Envoi notification à tous les abonnés
         await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/notify`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -53,32 +54,6 @@ export async function PUT(req, { params }) {
         console.error("Erreur notification statut :", e);
       }
     }
-
-   // 🔔 Notification spéciale pour les administrateurs uniquement
-if (statut && ["pris en compte", "solutionné"].includes(statut)) {
-  try {
-    const userData = await db.collection("users").findOne({ _id: problem.userId });
-
-    if (userData) {
-      const adminUsers = await db.collection("users").find({ role: "admin" }).toArray();
-      const adminExternalIds = adminUsers.map(admin => admin.email); // ou autre identifiant OneSignal
-
-      const adminMsg = `🔔 ${userData.prenom} ${userData.nom} – Appartement ${userData.appartement}, Bâtiment ${userData.batiment}\n${problem.description}`;
-
-      await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/notify`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title: `👷 Mise à jour d'un problème`,
-          message: adminMsg,
-          include_external_user_ids: adminExternalIds // 👈 envoi uniquement aux admins
-        })
-      });
-    }
-  } catch (e) {
-    console.error("Erreur notification admin :", e);
-  }
-}
 
     return NextResponse.json({ success: true });
   } catch (e) {
