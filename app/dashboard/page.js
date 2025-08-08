@@ -46,20 +46,22 @@ function ActivitesPublic() {
       <div className="mb-3 font-bold">
         Total des heures ce mois : <span className="text-blue-800">{totalHeuresMois.toFixed(2)} h</span> / Année : <span className="text-blue-800">{totalHeuresAnnee.toFixed(2)} h</span>
       </div>
-      <ul className="space-y-2">
-        {activites.length === 0 && <li className="text-gray-400 italic">Aucune activité pour l’instant.</li>}
-        {activites.map((a, i) => (
-          <li key={a._id || i} className="border-l-4 border-blue-500 pl-3 py-1">
-            <div className="font-medium">{a.description}</div>
-            <div className="text-xs text-gray-600">
-              {a.date ? new Date(a.date).toLocaleDateString() : ""}
-              {a.heureDebut && a.heureFin
-                ? ` | ${a.heureDebut} → ${a.heureFin} (${diffHeures(a.heureDebut, a.heureFin).toFixed(2)} h)`
-                : ""}
-            </div>
-          </li>
-        ))}
-      </ul>
+    <ul className="space-y-2">
+  {activites.length === 0 && (
+    <li className="text-gray-400 italic">Aucune activité pour l’instant.</li>
+  )}
+  {activites.map((a, i) => (
+    <li key={a._id || i} className="border-l-4 border-blue-500 pl-3 py-1">
+      <div className="font-medium">{a.description}</div>
+      <div className="text-xs text-gray-600">
+        {a.date ? dayjs(a.date).format("DD/MM/YYYY") : ""}
+        {a.heureDebut && a.heureFin
+          ? ` | ${dayjs(`2000-01-01T${a.heureDebut}`).format("HH:mm")} → ${dayjs(`2000-01-01T${a.heureFin}`).format("HH:mm")} (${diffHeures(a.heureDebut, a.heureFin).toFixed(2)} h)`
+          : ""}
+      </div>
+    </li>
+  ))}
+</ul>
     </div>
   );
 }
