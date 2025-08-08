@@ -38,8 +38,8 @@ export async function PUT(req, { params }) {
 
     // 🔔 Notification unique avec le corps du message
     if (statut && ["pris en compte", "solutionné"].includes(statut)) {
-      const capitalized =
-        statut.charAt(0).toUpperCase() + statut.slice(1).replace("e", "é");
+    const capitalized = statut.charAt(0).toUpperCase() + statut.slice(1);
+
 
       try {
         // Notification contenant le titre et le message du problème
