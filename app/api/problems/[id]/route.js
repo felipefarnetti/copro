@@ -4,6 +4,7 @@ import { verifyToken } from "@/lib/auth";
 import { ObjectId } from "mongodb";
 
 // Modifier un problème (description ET/OU statut)
+// Modifier un problème (description ET/OU statut)
 export async function PUT(req, { params }) {
   try {
     const auth = req.headers.get("authorization");
@@ -35,19 +36,19 @@ export async function PUT(req, { params }) {
     const result = await db.collection("problems").updateOne(query, { $set: update });
     if (result.matchedCount === 0) return NextResponse.json({ error: "Non autorisé" }, { status: 403 });
 
-    // 🔔 Notification utilisateur (statut changé) - Envoi à tous les utilisateurs
+    // 🔔 Notification unique avec le corps du message
     if (statut && ["pris en compte", "solutionné"].includes(statut)) {
       const capitalized =
         statut.charAt(0).toUpperCase() + statut.slice(1).replace("e", "é");
 
       try {
-        // Envoi notification à tous les abonnés
+        // Notification contenant le titre et le message du problème
         await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"}/api/notify`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             title: `🔔 Problème ${capitalized}`,
-            message: problem.description
+            message: problem.description // corps du message
           })
         });
       } catch (e) {
@@ -60,6 +61,7 @@ export async function PUT(req, { params }) {
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 });
   }
 }
+
 
 // Supprimer (archive) un problème
 export async function DELETE(req, { params }) {
