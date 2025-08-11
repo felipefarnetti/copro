@@ -14,6 +14,14 @@ export default function Archive() {
   const [statutFilter, setStatutFilter] = useState("tous");
   const router = useRouter();
 
+  // clé de tri : la date “la plus pertinente” selon le statut
+  const getSortDate = (p) => {
+    if (p.statut === "supprimé" && p.dateSuppression) return new Date(p.dateSuppression);
+    if (p.statut === "solutionné" && p.dateResolution) return new Date(p.dateResolution);
+    if (p.updatedAt) return new Date(p.updatedAt);
+    return new Date(p.createdAt);
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) { router.push("/"); return; }
@@ -28,7 +36,7 @@ export default function Archive() {
   if (statutFilter !== "tous") {
     filtered = filtered.filter(p => p.statut === statutFilter);
   }
-  filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    filtered.sort((a, b) => getSortDate(b) - getSortDate(a));
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
@@ -69,6 +77,9 @@ export default function Archive() {
                   <span className="font-medium text-blue-700">Description :</span>{" "}
                   <span className="text-gray-800">{p.description}</span>
                 </div>
+               <div className="mb-1 text-xs text-gray-500">
+                Dernière activité : {getSortDate(p).toLocaleString()}
+              </div>
                 <div className="mb-1 flex items-center">
                   <span className="font-medium text-blue-700 mr-2">Statut :</span>
                   <span
