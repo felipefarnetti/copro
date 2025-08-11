@@ -159,17 +159,21 @@ export default function Dashboard() {
   };
 
   const now = dayjs();
-  const myProblems = problems.filter(p => {
-    if (p.userId !== user?.id) return false;
+  const myProblems = problems.filter((p) => {
+  const ownerId = (p.userId?._id || p.userId)?.toString?.() || p.userId;
+    if (ownerId !== user?.id) return false;
     if (p.statut === "supprimé") return false;
     if (p.statut === "solutionné" && p.dateResolution && dayjs(now).diff(dayjs(p.dateResolution), "month") >= 3) return false;
     return true;
   });
-  const otherProblems = problems.filter(p =>
-    p.userId !== user?.id &&
-    p.statut !== "supprimé" &&
-    !(p.statut === "solutionné" && p.dateResolution && dayjs(now).diff(dayjs(p.dateResolution), "month") >= 3)
-  );
+      const otherProblems = problems.filter((p) => {
+      const ownerId = (p.userId?._id || p.userId)?.toString?.() || p.userId;
+      return (
+      ownerId !== user?.id &&
+      p.statut !== "supprimé" &&
+      !(p.statut === "solutionné" && p.dateResolution && dayjs(now).diff(dayjs(p.dateResolution), "month") >= 3)
+      );
+      });
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">

@@ -27,10 +27,9 @@ export default function ProblemCard({ problem, refreshProblems, isAdmin, onSetSt
 
   const handleDelete = async () => {
     const token = localStorage.getItem("token");
-    await fetch(`/api/problems/${problem._id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ statut: "supprimé", dateSuppression: new Date() }),
+     await fetch(`/api/problems/${problem._id}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${token}` },
     });
     refreshProblems(token);
   };

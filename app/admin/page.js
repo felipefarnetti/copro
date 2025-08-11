@@ -82,22 +82,46 @@ export default function AdminDashboard() {
     }
   };
 
-// Problèmes avec notification auto selon le statut
-const handleSetStatus = async (id, status) => {
-  const token = localStorage.getItem("token");
-  let body = { statut: status };
-  if (status === "solutionné") body.dateResolution = new Date();
-  if (status === "supprimé") body.dateSuppression = new Date();
+  // Problèmes avec notification auto selon le statut (mise à jour optimiste incluse)
+  const handleSetStatus = async (id, status) => {
+    const token = localStorage.getItem("token");
+    let body = { statut: status };
+    if (status === "solutionné") body.dateResolution = new Date();
+    if (status === "supprimé") body.dateSuppression = new Date();
 
-  await fetch(`/api/problems/${id}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-    body: JSON.stringify(body),
-  });
+    // --- Optimistic update ---
+    setProblems((prev) => {
+      const updated = prev.map((p) =>
+        p._id === id
+          ? {
+              ...p,
+              statut: status,
+              ...(status === "solutionné"
+                ? { dateResolution: new Date().toISOString() }
+                : {}),
+              ...(status === "supprimé"
+                ? { dateSuppression: new Date().toISOString() }
+                : {}),
+            }
+          : p
+      );
+      // si "supprimé", on le retire immédiatement de la liste courante
+      return updated.filter((p) => p.statut !== "supprimé");
+    });
 
-  fetchProblems(token);
-};
+    // --- Requête serveur ---
+    await fetch(`/api/problems/${id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(body),
+    });
 
+    // --- Re-sync avec la vérité serveur ---
+    fetchProblems(token);
+  };
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -107,9 +131,12 @@ const handleSetStatus = async (id, status) => {
   const goToTodoSyndic = () => router.push("/admin/todo-syndic");
   const goToActivites = () => router.push("/admin/activites");
 
+  // Exclure "supprimé" de la liste courante
+  const visibleProblems = problems.filter((p) => p.statut !== "supprimé");
+
   return (
     <main className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-950 to-blue-800 flex flex-col items-center py-6 sm:py-10 px-1 sm:px-2 w-full">
-                    <OneSignalMobileOnly />
+      <OneSignalMobileOnly />
       <NotifStatusIcon />
 
       <div className="w-full max-w-3xl">
@@ -177,10 +204,10 @@ const handleSetStatus = async (id, status) => {
             Tous les problèmes signalés
           </h2>
           <ul className="space-y-2 mb-4">
-            {problems.length === 0 && (
+            {visibleProblems.length === 0 && (
               <li className="text-gray-500">Aucun problème signalé.</li>
             )}
-            {problems.map((p) => (
+            {visibleProblems.map((p) => (
               <ProblemCard
                 key={p._id}
                 problem={p}
@@ -210,7 +237,9 @@ const handleSetStatus = async (id, status) => {
                 placeholder="Prénom"
                 className="w-1/2 border rounded px-2 py-1 placeholder-gray-500"
                 value={newUser.prenom}
-                onChange={e => setNewUser(u => ({ ...u, prenom: e.target.value }))}
+                onChange={(e) =>
+                  setNewUser((u) => ({ ...u, prenom: e.target.value }))
+                }
               />
               <input
                 type="text"
@@ -218,7 +247,9 @@ const handleSetStatus = async (id, status) => {
                 placeholder="Nom"
                 className="w-1/2 border rounded px-2 py-1 placeholder-gray-500"
                 value={newUser.nom}
-                onChange={e => setNewUser(u => ({ ...u, nom: e.target.value }))}
+                onChange={(e) =>
+                  setNewUser((u) => ({ ...u, nom: e.target.value }))
+                }
               />
             </div>
             <input
@@ -227,21 +258,27 @@ const handleSetStatus = async (id, status) => {
               placeholder="Email"
               className="w-full border rounded px-2 py-1 placeholder-gray-500"
               value={newUser.email}
-              onChange={e => setNewUser(u => ({ ...u, email: e.target.value }))}
+              onChange={(e) =>
+                setNewUser((u) => ({ ...u, email: e.target.value }))
+              }
             />
             <input
               type="tel"
               placeholder="Téléphone"
               className="w-full border rounded px-2 py-1 placeholder-gray-500"
               value={newUser.telephone}
-              onChange={e => setNewUser(u => ({ ...u, telephone: e.target.value }))}
+              onChange={(e) =>
+                setNewUser((u) => ({ ...u, telephone: e.target.value }))
+              }
             />
             <div className="flex gap-2">
               <select
                 required
                 className="w-1/2 border rounded px-2 py-1 text-gray-900 bg-white"
                 value={newUser.batiment}
-                onChange={e => setNewUser(u => ({ ...u, batiment: e.target.value }))}
+                onChange={(e) =>
+                  setNewUser((u) => ({ ...u, batiment: e.target.value }))
+                }
               >
                 <option value="">Bâtiment...</option>
                 <option value="A">A</option>
@@ -256,13 +293,17 @@ const handleSetStatus = async (id, status) => {
                 placeholder="Appartement"
                 className="w-1/2 border rounded px-2 py-1 placeholder-gray-500"
                 value={newUser.appartement}
-                onChange={e => setNewUser(u => ({ ...u, appartement: e.target.value }))}
+                onChange={(e) =>
+                  setNewUser((u) => ({ ...u, appartement: e.target.value }))
+                }
               />
             </div>
             <select
               className="w-1/2 border rounded px-2 py-1 text-gray-900 bg-white"
               value={newUser.role}
-              onChange={e => setNewUser(u => ({ ...u, role: e.target.value }))}
+              onChange={(e) =>
+                setNewUser((u) => ({ ...u, role: e.target.value }))
+              }
             >
               <option value="copro">Habitant</option>
               <option value="admin">Administrateur</option>
@@ -273,18 +314,24 @@ const handleSetStatus = async (id, status) => {
               placeholder="Mot de passe"
               className="w-full border rounded px-2 py-1 placeholder-gray-500"
               value={newUser.password}
-              onChange={e => setNewUser(u => ({ ...u, password: e.target.value }))}
+              onChange={(e) =>
+                setNewUser((u) => ({ ...u, password: e.target.value }))
+              }
             />
             <div className="flex justify-end gap-2 pt-2">
               <button
                 type="button"
-                className="px-3 py-1 rounded bg-red-500 hover:bg-red-700"
+                className="px-3 py-1 rounded bg-red-500 hover:bg-red-700 text-white"
                 onClick={() => setShowModal(false)}
-              >Annuler</button>
+              >
+                Annuler
+              </button>
               <button
                 type="submit"
                 className="px-4 py-1 rounded bg-blue-700 text-white font-semibold hover:bg-blue-800"
-              >Créer</button>
+              >
+                Créer
+              </button>
             </div>
           </form>
         </div>

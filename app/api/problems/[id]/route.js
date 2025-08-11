@@ -17,7 +17,9 @@ export async function PUT(req, { params }) {
     const client = await clientPromise;
     const db = client.db("copro");
     const query = { _id: new ObjectId(params.id) };
-    if (user.role !== "admin") query.userId = user.id;
+    if (user.role !== "admin") {
+    query.userId = typeof user.id === "string" ? new ObjectId(user.id) : user.id;
+    }
 
     // 🔍 Récupérer le problème avant modification
     const problem = await db.collection("problems").findOne(query);
@@ -75,8 +77,9 @@ export async function DELETE(req, { params }) {
     const client = await clientPromise;
     const db = client.db("copro");
     const query = { _id: new ObjectId(params.id) };
-    if (user.role !== "admin") query.userId = user.id;
-
+    if (user.role !== "admin") {
+    query.userId = typeof user.id === "string" ? new ObjectId(user.id) : user.id;
+  }
     const result = await db.collection("problems").updateOne(
       query,
       { $set: { statut: "supprimé", dateSuppression: new Date() } }
