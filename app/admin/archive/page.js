@@ -77,9 +77,6 @@ export default function Archive() {
                   <span className="font-medium text-blue-700">Description :</span>{" "}
                   <span className="text-gray-800">{p.description}</span>
                 </div>
-               <div className="mb-1 text-xs text-gray-500">
-                Dernière activité : {getSortDate(p).toLocaleString()}
-              </div>
                 <div className="mb-1 flex items-center">
                   <span className="font-medium text-blue-700 mr-2">Statut :</span>
                   <span
